@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Evolution Game v12.0</title>
+<title>Doodle Evolution Game v13.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -53,6 +53,42 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 .how .center{text-align:center}
 .card canvas.topart{width:230px;height:150px}
 @media (max-height:480px){ .card canvas.topart{width:160px;height:104px} }
+/* Leaderboard (v13.0) */
+.lb{margin-top:10px}
+.lbh{font-size:19px;font-weight:700}
+.lbrow{display:flex;gap:6px;justify-content:center;margin-top:4px}
+.lbc{flex:1;max-width:120px;min-width:0;border:2.5px dashed var(--ink);border-radius:14px;padding:2px 2px 4px;display:flex;flex-direction:column;align-items:center;line-height:1}
+.lbc i{font-style:normal;font-size:15px;color:#777}
+.lbc b{font-size:22px;letter-spacing:2px}
+.lbc span{font-size:16px;min-height:16px}
+.lbc.empty b,.lbc.empty span{color:#aaa}
+.card .lbc canvas{width:84px;height:56px;margin:0}
+.lbnote{font-size:15px;color:#888;margin-top:3px;min-height:0}
+.you{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;font-size:18px;line-height:1}
+.you b{font-size:22px;letter-spacing:2px}
+.you i{font-style:normal;color:#777;font-size:16px}
+.card .you canvas{width:60px;height:40px;margin:0}
+.entry{margin-top:6px}
+.entry.hidden,.entry .hidden{display:none}
+.entrymsg{font-size:22px;font-weight:700}
+.initials{display:flex;gap:10px;justify-content:center;margin-top:6px}
+.initials input{width:52px;height:60px;font-family:inherit;font-size:40px;font-weight:700;text-align:center;border:3px solid var(--ink);
+  border-radius:12px 18px 10px 16px/16px 10px 18px 12px;background:#fff;color:var(--ink);text-transform:uppercase;padding:0;outline:none}
+.initials input:focus{box-shadow:3px 3px 0 var(--ink)}
+.card canvas.entryart{width:140px;height:92px}
+#topOv .entryart{display:none}
+#deadOv .card,#topOv .card{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow-y:auto}
+@media (max-height:480px){
+  #startOv .card{display:grid;grid-template-columns:1fr 1fr;column-gap:22px;align-items:center;max-width:760px;text-align:center}
+  #startOv .card > *{grid-column:1}
+  #startOv #startArt{display:none}
+  #startOv .card > .lb{grid-column:2;grid-row:1 / span 6;margin-top:0}
+  .card .lbc canvas{width:76px;height:50px}
+  .initials input{width:44px;height:50px;font-size:32px}
+  .entering #deadArt,.entering #deadMsg,.entering > p,.entering canvas.topart{display:none}
+  .card.entering canvas.entryart{width:90px;height:59px;margin-top:0}
+  .entering .entrymsg{font-size:19px}
+}
 .final{font-size:34px;font-weight:700;line-height:1;margin-top:6px}
 .mut{border:2.5px dashed var(--ink);border-radius:18px;padding:6px 10px 8px;margin-top:10px;
   flex:1;background:#fff;color:var(--ink);font-family:inherit;cursor:pointer;min-width:0}
@@ -103,10 +139,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Evolution Game</div><div class="v">v12.0</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Evolution Game</div><div class="v">v13.1</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Evolution Game</h1><div class="ver">v12.0</div>
+  <h1>Doodle Evolution Game</h1><div class="ver">v13.1</div>
   <canvas id="startArt" width="320" height="240"></canvas>
   <p>You're a teeny tiny cell!<br>Eat creatures your size or smaller.<br>Avoid the grumpy ones.</p>
   <div class="diffs" id="diffs">
@@ -114,7 +150,12 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
     <button class="diff" data-d="normal">Normal</button>
     <button class="diff" data-d="hard">Hard</button>
   </div>
-  <div class="best" id="bestLine"></div>
+  <div class="lb" id="lb">
+    <div class="lbh" id="lbHead"></div>
+    <div class="lbrow" id="lbRow"></div>
+    <div class="lbnote" id="lbNote"></div>
+    <div class="you" id="youRow"></div>
+  </div>
   <div class="startbtns"><button class="btn" id="startBtn">Let's go!</button>
   <button class="btn small" id="howBtn">How to play</button></div>
   <div class="hint" id="ctrlHint"></div>
@@ -143,6 +184,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <p>Some level ups make you bigger, and some let you pick a <b>mutation</b>: a new trick like swimming faster, biting harder or hiding better. Simpler mutations are listed first, just like real evolution. Mutations can keep evolving into stronger versions, so try different picks each game and find your favourite combo!</p>
   <h3>Score</h3>
   <p>Every snack scores points, and the faster you play, the bigger your bonus. Make it all the way to the Top of the Pond for a big speed bonus, then a <b>5-second feeding frenzy</b> to squeeze in every last point!</p>
+  <p>Beat the <b>top 3</b> (or your own best) and pop in your 3 letters. Your creature shows on the leaderboard, with a crown if you made it to the Top of the Pond!</p>
   <h3>Controls</h3>
   <div class="ctrls">
     <div class="ctrl"><b>Phone</b><p>Hold &amp; drag anywhere. You swim towards your finger, and the further you drag, the faster you go. Tap a card to pick a mutation.</p></div>
@@ -175,10 +217,23 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <button class="btn" id="againBtn">Try again</button>
 </div></div>
 
+<div class="entry hidden" id="entry">
+  <div class="entrymsg" id="entryMsg"></div>
+  <canvas id="entryArt" class="entryart" width="280" height="184"></canvas>
+  <p id="entryAsk">Pop in your 3 letters:</p>
+  <div class="initials" id="initials">
+    <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="First letter">
+    <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Second letter">
+    <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Third letter" enterkeyhint="done">
+  </div>
+  <button class="btn" id="saveBtn">Save my score!</button>
+  <div class="lbnote" id="saveNote"></div>
+</div>
+
 <script>
 (() => {
 'use strict';
-const VERSION = '12.0';
+const VERSION = '13.1';
 const TAU = Math.PI * 2;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -1436,13 +1491,14 @@ function lockScore() {
   $('topBest').textContent = player.newBest ? 'New high score!' : `Best on ${diffKey}: ${bestNow.toLocaleString()}`;
   $('topBonus').textContent = player.bonus > 0 ? `including a +${player.bonus.toLocaleString()} speed bonus` : '';
   topFit = null;
+  closeEntry(); offerEntry('topOv');
   show('topOv', true);
 }
 function toMainMenu() {
   if (state === 'play' || state === 'mutate' || state === 'paused') saveBest();
   state = 'start'; pointer.active = false; keys.clear();
   show('mutOv', false); show('deadOv', false); show('topOv', false); show('brand', false); show('restartBtn', false);
-  resetGame(); showBestLine(); show('startOv', true);
+  closeEntry(); resetGame(); refreshBoard(diffKey, true); showBestLine(); show('startOv', true);
 }
 function die() {
   state = 'dead'; pointer.active = false; keys.clear();
@@ -1451,12 +1507,13 @@ function die() {
   saveBest();
   $('deadScore').textContent = (player.newBest ? 'New high score! ' : 'Score: ') + player.score.toLocaleString();
   $('deadBest').textContent = player.newBest ? '' : `Best on ${diffKey}: ${bestNow.toLocaleString()}`;
+  closeEntry(); offerEntry('deadOv');
   setTimeout(() => show('deadOv', true), 500);
 }
 $('startBtn').onclick = () => { show('startOv', false); show('brand', true); show('restartBtn', true); resetGame(); state = 'play'; };
-$('againBtn').onclick = () => { show('deadOv', false); resetGame(); state = 'play'; };
-$('keepBtn').onclick = () => { show('topOv', false); state = 'play'; toast('Munching just for fun now!'); };
-$('topAgainBtn').onclick = () => { show('topOv', false); resetGame(); state = 'play'; };
+$('againBtn').onclick = () => { closeEntry(); show('deadOv', false); resetGame(); state = 'play'; };
+$('keepBtn').onclick = () => { closeEntry(); show('topOv', false); state = 'play'; toast('Munching just for fun now!'); };
+$('topAgainBtn').onclick = () => { closeEntry(); show('topOv', false); resetGame(); state = 'play'; };
 $('topMenuBtn').onclick = () => toMainMenu();
 $('howBtn').onclick = () => { show('startOv', false); show('howOv', true); $('howOv').querySelector('.card').scrollTop = 0; };
 $('howClose').onclick = () => { show('howOv', false); show('startOv', true); };
@@ -1476,10 +1533,133 @@ $('restartBtn').onclick = e => {
 
 const touch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 
-function showBestLine() {
-  const b = loadBest(diffKey);
-  $('bestLine').textContent = b > 0 ? `High score on ${diffKey}: ${b.toLocaleString()}` : 'No high score yet on ' + diffKey;
+// ---------- Leaderboard (v13.0) ----------
+// Shared top 3 per difficulty, stored in Firebase Firestore (collections evolution_easy / _normal / _hard) via its REST API.
+// Leave these blank and the board just shows as offline; your own best still works (it's kept on this device).
+const FIREBASE = { apiKey:'AIzaSyD6hux9hQsFsfnYTGCTbo4EBDbfo8O8my8', projectId:'doodle-games-8beba' };
+const LB_ON = !!(FIREBASE.apiKey && FIREBASE.projectId);
+const lbCache = {};                                   // diff -> { list:[{name,score,muts,top}], at:time }
+const fsURL = p => `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents${p}?key=${FIREBASE.apiKey}`;
+const savedName = () => { try { const n = localStorage.getItem('evo_name'); return /^[A-Z]{3}$/.test(n) ? n : ''; } catch (_) { return ''; } };
+function loadRec(k) { try { const r = JSON.parse(localStorage.getItem('evo_bestrec_' + k)); return r && r.score > 0 ? r : null; } catch (_) { return null; } }
+function saveRec(k, r) { try { localStorage.setItem('evo_bestrec_' + k, JSON.stringify(r)); } catch (_) {} }
+async function fetchBoard(k) {
+  const r = await fetch(fsURL(':runQuery'), { method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ structuredQuery:{ from:[{ collectionId:'evolution_' + k }], orderBy:[{ field:{ fieldPath:'score' }, direction:'DESCENDING' }], limit:3 } }) });
+  if (!r.ok) throw new Error('board ' + r.status);
+  const out = [];
+  for (const row of await r.json()) {
+    try {
+      const f = row.document.fields, name = f.name.stringValue, score = parseInt(f.score.integerValue, 10);
+      if (!/^[A-Z]{3}$/.test(name) || !(score > 0)) continue;
+      const muts = ((f.muts.arrayValue || {}).values || []).map(v => v.stringValue).filter(m => MUTS[m]);
+      out.push({ name, score, muts, top: !!(f.top && f.top.booleanValue) });
+    } catch (_) {}
+  }
+  return out;
 }
+async function submitScore(k, e) {
+  const r = await fetch(fsURL('/evolution_' + k), { method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ fields:{ name:{ stringValue:e.name }, score:{ integerValue:String(e.score) },
+      muts:{ arrayValue: e.muts.length ? { values: e.muts.map(m => ({ stringValue:m })) } : {} },
+      top:{ booleanValue: !!e.top }, v:{ stringValue:VERSION } } }) });
+  if (!r.ok) throw new Error('save ' + r.status);
+}
+function refreshBoard(k, force) {
+  if (!LB_ON) return;
+  const c = lbCache[k];
+  if (!force && c && Date.now() - c.at < 30000) return;
+  fetchBoard(k).then(list => { lbCache[k] = { list, at:Date.now() }; if (k === diffKey) showBestLine(); })
+    .catch(() => { if (k === diffKey && !lbCache[k]) { $('lbNote').textContent = 'leaderboard is napping, try again later'; } });
+}
+// Draw a creature (from its list of mutations) scaled to fit a small canvas, with a crown if it reached the Top of the Pond
+function drawFit(cvs, muts, crown) {
+  const N = 500, off = document.createElement('canvas'); off.width = N; off.height = N; const o = off.getContext('2d');
+  const q = { x:0, y:0, r:40, heading:0, speed:40, vx:0, vy:0, tailPhase:1.5, hurt:false, mouthOpen:false };
+  for (const m of muts || []) q[m] = true;
+  const paint = (g, lw) => { g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK; drawPlayer(g, q, mulberry(55), lw);
+    if (crown && q.crownAt) { g.lineWidth = lw; drawCrown(g, q.crownAt[0], q.crownAt[1] + 2, q.r * 0.78, 0.28); } };
+  o.translate(N / 2, N / 2); paint(o, 3);
+  const d = o.getImageData(0, 0, N, N).data; let x0 = N, x1 = 0, y0 = N, y1 = 0;
+  for (let y = 0; y < N; y += 2) for (let x = 0; x < N; x += 2) if (d[(y * N + x) * 4 + 3] > 20) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  const g = cvs.getContext('2d'), W = cvs.width, H = cvs.height;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
+  if (x1 < x0) return;
+  const k = Math.min((W - 8) / (x1 - x0 + 6), (H - 8) / (y1 - y0 + 6), 2.2);
+  g.translate(W / 2 - ((x0 + x1) / 2 - N / 2) * k, H / 2 - ((y0 + y1) / 2 - N / 2) * k); g.scale(k, k); paint(g, 2.6 * (W / 168) / k);
+  g.setTransform(1, 0, 0, 1, 0, 0);
+}
+function drawQuestion(cvs) {                          // an empty podium spot: a dashed little "?" cell
+  const g = cvs.getContext('2d'), W = cvs.width, H = cvs.height;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, W, H);
+  g.strokeStyle = '#bbb'; g.lineWidth = 3; g.setLineDash([6, 7]); g.beginPath(); g.arc(W / 2, H / 2, H * 0.34, 0, TAU); g.stroke(); g.setLineDash([]);
+  g.fillStyle = '#bbb'; g.font = `700 ${Math.round(H * 0.42)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', W / 2, H / 2 + 2);
+}
+function showBestLine() {
+  $('lbHead').textContent = `Top 3 on ${diffKey}`;
+  const c = lbCache[diffKey], list = c ? c.list : [];
+  $('lbNote').textContent = !LB_ON ? 'leaderboard coming soon!' : c ? (list.length ? '' : 'nobody yet. Be the first!') : 'loading...';
+  const row = $('lbRow'); row.innerHTML = '';
+  ['1st', '2nd', '3rd'].forEach((place, i) => {
+    const e = list[i], d = document.createElement('div'); d.className = 'lbc' + (e ? '' : ' empty');
+    d.innerHTML = `<i>${place}</i><canvas width="168" height="112"></canvas><b>${e ? e.name : '???'}</b><span>${e ? e.score.toLocaleString() : ''}</span>`;
+    row.appendChild(d);
+    const cvs = d.querySelector('canvas'); if (e) drawFit(cvs, e.muts, e.top); else drawQuestion(cvs);
+  });
+  const rec = loadRec(diffKey), b = Math.max(loadBest(diffKey), rec ? rec.score : 0), you = $('youRow');
+  if (b > 0) {
+    const same = rec && rec.score >= b;
+    you.innerHTML = `<i>your best</i><canvas width="120" height="80"></canvas><b>${same && rec.name ? rec.name : '???'}</b><span>${b.toLocaleString()}</span>`;
+    drawFit(you.querySelector('canvas'), same ? rec.muts : [], same && rec.top);
+  } else you.innerHTML = `<i>your best: no score yet on ${diffKey}</i>`;
+  refreshBoard(diffKey);
+}
+// End of a run: if you beat your own best or the top 3, ask for 3 letters
+let entryRun = null;
+const initials = () => [...document.querySelectorAll('#initials input')];
+function offerEntry(ov) {
+  const s = player.score, k = diffKey, muts = Object.keys(MUTS).filter(m => player[m]), top = !!player.maxed;
+  const mine = s > 0 && s > bestAtStart, c = lbCache[k];
+  const onBoard = LB_ON && s > 0 && (!c || c.list.length < 3 || s > c.list[c.list.length - 1].score);
+  if (mine) saveRec(k, { score:s, muts, top, name:savedName() });
+  const box = $('entry');
+  if (!mine && !onBoard) { box.classList.add('hidden'); return; }
+  entryRun = { k, score:s, muts, top, mine };
+  (ov === 'topOv' ? $('topBest') : $('deadBest')).after(box);
+  $('entryMsg').textContent = onBoard && c ? 'You made the top 3!' : '';
+  drawFit($('entryArt'), muts, top);
+  const n = savedName(); initials().forEach((inp, i) => { inp.value = n[i] || ''; inp.disabled = false; });
+  $('initials').classList.remove('hidden'); $('entryAsk').classList.remove('hidden');
+  $('saveBtn').classList.remove('hidden'); $('saveBtn').disabled = false; $('saveNote').textContent = '';
+  box.classList.remove('hidden'); $(ov).querySelector('.card').classList.add('entering');
+  if (ov === 'deadOv') $('againBtn').className = 'btn small';
+}
+function closeEntry() { document.querySelectorAll('.entering').forEach(c => c.classList.remove('entering')); $('entry').classList.add('hidden'); entryRun = null; $('againBtn').className = 'btn'; }
+initials().forEach((inp, i, all) => {
+  inp.addEventListener('input', () => { inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g, '').slice(-1); if (inp.value && i < 2) all[i + 1].focus(); });
+  inp.addEventListener('keydown', e => {
+    e.stopPropagation();                             // typing letters mustn't steer the cell or press other buttons
+    if (e.key === 'Backspace' && !inp.value && i > 0) { all[i - 1].focus(); all[i - 1].value = ''; e.preventDefault(); }
+    if (e.key === 'Enter') { e.preventDefault(); $('saveBtn').click(); }
+  });
+  inp.addEventListener('focus', () => inp.select());
+});
+$('saveBtn').onclick = async () => {
+  if (!entryRun) return;
+  const name = initials().map(i => i.value).join('');
+  if (!/^[A-Z]{3}$/.test(name)) { $('saveNote').textContent = 'three letters please!'; return; }
+  const run = entryRun; try { localStorage.setItem('evo_name', name); } catch (_) {}
+  if (run.mine) { const r = loadRec(run.k); if (r && r.score === run.score) saveRec(run.k, { ...r, name }); }
+  $('saveBtn').disabled = true; initials().forEach(i => { i.disabled = true; i.blur(); });
+  if (LB_ON) {
+    $('saveNote').textContent = 'saving...';
+    try { await submitScore(run.k, { name, score:run.score, muts:run.muts, top:run.top }); $('saveNote').textContent = 'Saved! Look for it on the main menu!'; }
+    catch (_) { $('saveNote').textContent = "Couldn't reach the leaderboard, but it's saved on this device."; }
+    delete lbCache[run.k]; refreshBoard(run.k, true);
+  } else $('saveNote').textContent = 'Saved on this device!';
+  $('saveBtn').classList.add('hidden'); $('initials').classList.add('hidden'); $('entryAsk').classList.add('hidden');
+  if (entryRun === run) entryRun = null;
+};
 function setDiff(k) {
   diffKey = k; DIFF = DIFFS[k];
   document.querySelectorAll('.diff').forEach(b => b.classList.toggle('on', b.dataset.d === k));
