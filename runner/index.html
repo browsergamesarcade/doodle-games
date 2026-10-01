@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Doodle Runner Game v1.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--paper:#fff;--grey:#9a9a9a;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);
+  font-family:'Gaegu','Comic Sans MS',cursive;overscroll-behavior:none;touch-action:none;}
+canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;}
+#safe{position:fixed;inset:0;pointer-events:none;visibility:hidden;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+#brand{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(6px + env(safe-area-inset-bottom));
+  text-align:center;pointer-events:none;line-height:1;}
+#brand .t{font-size:15px;font-weight:700;opacity:.5}
+#brand .v{font-size:11px;color:var(--grey);margin-top:1px}
+.overlay{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:flex-start;padding:16px;
+  background:rgba(255,255,255,.72);z-index:10;overflow:auto;}
+.overlay.hidden,#brand.hidden{display:none}
+.overlay > .card{margin:auto}   /* centred, but scrolls from the top (never clipped) when taller than the screen */
+@media (orientation:portrait) and (max-height:780px){
+  #startOv .card{padding:14px 18px 14px}
+  #startOv .card h1{font-size:38px}
+  #startOv #startArt{width:110px;height:82px}
+  #startOv .card p{font-size:18px;margin-top:2px}
+  #startOv .lb{margin-top:6px}
+  #startOv .btn{margin-top:6px}
+}
+@media (orientation:portrait) and (max-height:620px){
+  #startOv #startArt{display:none}
+  #startOv .card .lbc canvas{width:70px;height:46px}
+}
+.card{background:#fff;border:3px solid var(--ink);border-radius:255px 18px 225px 18px/18px 225px 18px 255px;
+  padding:20px 24px 18px;max-width:360px;width:100%;text-align:center;box-shadow:4px 5px 0 var(--ink);}
+.card h1{font-size:44px;line-height:.9;font-weight:700}
+.card .ver{font-size:14px;color:var(--grey);margin-top:3px}
+.card h2{font-size:36px;font-weight:700;line-height:1}
+.card p{font-size:20px;line-height:1.1;margin-top:6px}
+.card canvas{display:block;margin:4px auto 0;width:160px;height:120px}
+.btn{font-family:inherit;font-size:25px;font-weight:700;background:#fff;color:var(--ink);border:3px solid var(--ink);
+  border-radius:15px 225px 15px 255px/255px 15px 225px 15px;padding:5px 28px 3px;margin-top:12px;cursor:pointer;
+  box-shadow:3px 3px 0 var(--ink);}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.hint{font-size:17px;color:#666;margin-top:10px;line-height:1.1}
+.btn.small{font-size:19px;padding:3px 18px 1px;margin-top:8px;box-shadow:2px 2px 0 var(--ink)}
+.startbtns{display:flex;flex-direction:column;align-items:center}
+.btnrow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.btnrow .btn{margin-top:6px}
+.card.how{max-width:600px;text-align:left;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);overflow-y:auto;padding:16px 20px 16px}
+.how h2{text-align:center}
+.how canvas#howArt{width:280px;height:100px;margin:2px auto 0}
+.how h3{font-size:23px;line-height:1;margin-top:10px}
+.how p,.how li{font-size:18px;line-height:1.15}
+.how p{margin-top:3px}
+.how ul{margin:3px 0 0 20px}
+.how .ctrls{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.how .ctrl{flex:1 1 220px;border:2.5px dashed var(--ink);border-radius:16px;padding:6px 12px 8px}
+.how .ctrl b{font-size:21px}
+.how .center{text-align:center}
+.card canvas.topart{width:230px;height:150px}
+@media (max-height:480px){ .card canvas.topart{width:160px;height:104px} }
+/* Leaderboard (v13.0) */
+.lb{margin-top:10px}
+.lbh{font-size:19px;font-weight:700}
+.lbrow{display:flex;gap:6px;justify-content:center;margin-top:4px}
+.lbc{flex:1;max-width:120px;min-width:0;border:2.5px dashed var(--ink);border-radius:14px;padding:2px 2px 4px;display:flex;flex-direction:column;align-items:center;line-height:1}
+.lbc i{font-style:normal;font-size:15px;color:#777}
+.lbc b{font-size:22px;letter-spacing:2px}
+.lbc span{font-size:16px;min-height:16px}
+.lbc.empty b,.lbc.empty span{color:#aaa}
+.card .lbc canvas{width:84px;height:56px;margin:0}
+.lbnote{font-size:15px;color:#888;margin-top:3px;min-height:0}
+.you{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;font-size:18px;line-height:1}
+.you b{font-size:22px;letter-spacing:2px}
+.you i{font-style:normal;color:#777;font-size:16px}
+.card .you canvas{width:60px;height:40px;margin:0}
+.lblink{font-family:inherit;font-size:17px;font-weight:700;background:none;border:none;color:var(--ink);text-decoration:underline wavy 1.5px;text-underline-offset:4px;cursor:pointer;margin-top:4px;padding:2px 6px}
+.lblink.hidden{display:none}
+.card.board{max-width:460px;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);display:flex;flex-direction:column}
+.board .diffs{margin-top:6px}
+.t10{overflow-y:auto;margin-top:8px;padding:0 4px;flex:1;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.t10row{display:grid;grid-template-columns:44px 96px 1fr auto;align-items:center;gap:6px;padding:3px 4px;border-bottom:2px dashed #ccc;line-height:1}
+.t10row:last-child{border-bottom:none}
+.t10row i{font-style:normal;font-size:18px;color:#777;text-align:left}
+.t10row b{font-size:26px;letter-spacing:2px;text-align:left}
+.t10row span{font-size:20px}
+.card .t10row canvas{width:96px;height:56px;margin:0}
+.t10row.empty b,.t10row.empty span{color:#bbb}
+.t10row.me{background:#f2f2f2;border-radius:10px}
+#boardBack{align-self:center}
+@media (max-height:480px){ .card .t10row canvas{width:70px;height:42px} .t10row{grid-template-columns:40px 70px 1fr auto} .t10row b{font-size:22px} .card.board h2{font-size:28px} }
+.entry{margin-top:6px}
+.entry.hidden,.entry .hidden{display:none}
+.entrymsg{font-size:22px;font-weight:700}
+.initials{display:flex;gap:10px;justify-content:center;margin-top:6px}
+.initials input{width:52px;height:60px;font-family:inherit;font-size:40px;font-weight:700;text-align:center;border:3px solid var(--ink);
+  border-radius:12px 18px 10px 16px/16px 10px 18px 12px;background:#fff;color:var(--ink);text-transform:uppercase;padding:0;outline:none}
+.initials input:focus{box-shadow:3px 3px 0 var(--ink)}
+.card canvas.entryart{width:140px;height:92px}
+#topOv .entryart{display:none}
+#deadOv .card,#topOv .card{max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow-y:auto}
+@media (max-height:480px){
+  #startOv .card{display:grid;grid-template-columns:1fr 1fr;column-gap:22px;align-items:center;max-width:760px;text-align:center}
+  #startOv .card > *{grid-column:1}
+  #startOv #startArt{display:none}
+  #startOv .card > .lb{grid-column:2;grid-row:1 / span 6;margin-top:0}
+  .card .lbc canvas{width:76px;height:50px}
+  .initials input{width:44px;height:50px;font-size:32px}
+  .entering #deadArt,.entering #deadMsg,.entering > p,.entering canvas.topart{display:none}
+  .card.entering canvas.entryart{width:90px;height:59px;margin-top:0}
+  .entering .entrymsg{font-size:19px}
+}
+.final{font-size:34px;font-weight:700;line-height:1;margin-top:6px}
+.mut{border:2.5px dashed var(--ink);border-radius:18px;padding:6px 10px 8px;margin-top:10px;
+  flex:1;background:#fff;color:var(--ink);font-family:inherit;cursor:pointer;min-width:0}
+.mut:active{transform:translate(1px,2px)}
+.mut b{font-size:28px;display:block;line-height:1}
+.mut b.long{font-size:23px}
+.mut i{font-style:normal;font-size:13px;font-weight:700;display:inline-block;border:1.5px solid var(--ink);border-radius:8px;padding:0 6px;margin:2px 0 3px}
+.mut p{margin-top:2px;font-size:17px}
+.mut canvas{width:100%;max-width:120px;height:auto;aspect-ratio:4/3}
+.muts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;
+  max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px);overflow-y:auto;padding:2px 4px 6px;margin-top:4px;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.muts .mut{margin-top:0}
+.scrollhint{font-size:15px;color:#888;margin-top:4px}
+.card.wide{max-width:760px}
+.mut b.long{font-size:20px;line-height:0.95}
+@media (max-height:480px){
+  .card.wide{max-width:96vw;padding:8px 12px 10px}
+  .card.wide h2{font-size:26px} .card.wide > p{font-size:16px;margin-top:2px}
+  .mut{padding:3px 4px 5px} .mut canvas{max-width:70px} .muts{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));max-height:calc(100vh - 96px);max-height:calc(100dvh - 96px)}
+  .mut b{font-size:20px} .mut b.long{font-size:16px} .mut p{font-size:13px;line-height:1.05} .mut i{font-size:11px;margin:0 0 1px}
+}
+@media (max-width:560px){ .muts{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:420px){ .card.wide{padding:14px 12px} .mut{padding:5px 4px 6px} .mut b{font-size:23px} .mut p{font-size:15px} }
+.best{font-size:18px;margin-top:6px}
+.newbest{font-size:24px;font-weight:700;margin-top:4px}
+#restartBtn{position:fixed;z-index:5;left:calc(10px + env(safe-area-inset-left));bottom:calc(8px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:4px;font-family:inherit;font-size:17px;font-weight:700;line-height:1;
+  background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:15px 225px 15px 255px/255px 15px 225px 15px;
+  padding:4px 10px 3px 7px;cursor:pointer}
+#restartBtn svg{width:16px;height:16px}
+#restartBtn.armed{background:var(--ink);color:#fff}
+#restartBtn.hidden{display:none}
+.diffs{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.diff{font-family:inherit;font-size:20px;font-weight:700;background:#fff;color:var(--ink);border:2.5px solid var(--ink);
+  border-radius:225px 15px 255px 15px/15px 255px 15px 225px;padding:3px 12px 1px;cursor:pointer;flex:1;max-width:96px}
+.diff.on{background:var(--ink);color:#fff}
+@media (max-height:480px){
+  .diffs{margin-top:5px}.diff{font-size:18px}
+  .card{padding:10px 20px 12px;max-width:520px}
+  .card h1{font-size:34px}.card h2{font-size:30px}
+  .card canvas{width:120px;height:90px}
+  .card p{font-size:18px}.btn{margin-top:6px;font-size:22px}.hint{margin-top:5px}
+  .startbtns{flex-direction:row;justify-content:center;align-items:center;gap:12px}
+}
+/* Doodle Runner additions */
+.card canvas#startArt{width:200px;height:110px}
+.how canvas#howArt{width:300px;height:110px}
+.card canvas#deadArt{width:160px;height:110px}
+@media (orientation:portrait) and (max-height:780px){ #startOv #startArt{width:170px;height:94px} }
+#restartBtn{left:auto;bottom:auto;right:calc(10px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="safe"></div>
+<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v1.0</div></div>
+
+<div class="overlay" id="startOv"><div class="card">
+  <h1>Doodle Runner Game</h1><div class="ver">v1.0</div>
+  <canvas id="startArt" width="400" height="220"></canvas>
+  <p>Run, run, run!<br>Hop over holes and bouncy-jump up walls.<br>How far can you go?</p>
+  <div class="diffs" id="diffs">
+    <button class="diff" data-d="easy">Easy</button>
+    <button class="diff" data-d="normal">Normal</button>
+    <button class="diff" data-d="hard">Hard</button>
+  </div>
+  <div class="lb" id="lb">
+    <div class="lbh" id="lbHead"></div>
+    <div class="lbrow" id="lbRow"></div>
+    <div class="lbnote" id="lbNote"></div>
+    <button class="lblink" id="lbMore">see the top 10</button>
+    <div class="you" id="youRow"></div>
+  </div>
+  <div class="startbtns"><button class="btn" id="startBtn">Let's go!</button>
+  <button class="btn small" id="howBtn">How to play</button></div>
+  <div class="hint" id="ctrlHint"></div>
+</div></div>
+
+<button id="restartBtn" class="hidden" aria-label="Restart game">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M18.5 2.5v4.5H14"/></svg><span>restart</span>
+</button>
+
+<div class="overlay hidden" id="howOv"><div class="card how">
+  <h2>How to play</h2>
+  <canvas id="howArt" width="600" height="220"></canvas>
+  <h3>Your goal</h3>
+  <p>Your little runner never stops running! Keep up with the screen and see how far you can go.</p>
+  <h3>Jump</h3>
+  <p>Hop over holes and up onto walls. Hold jump a bit longer for a bigger jump, or just tap it for a little hop.</p>
+  <h3>Sprint</h3>
+  <p>Sprint for a quick burst of speed. You zoom ahead of your spot, and jumps from a sprint go higher and further, perfect for big gaps and tall walls! Your sprint needs a little rest before it's ready again, then you jog back to your spot.</p>
+  <h3>Watch out!</h3>
+  <p>Fall down a hole and it's game over. Bump into a wall and you'll stop, so jump over it quickly before the screen squishes you against the edge!</p>
+  <h3>Score</h3>
+  <p>Every metre you run counts, and the screen slowly gets faster the further you go. Beat the <b>top 3</b> (or your own best) and pop in your 3 letters for the leaderboard!</p>
+  <h3>Controls</h3>
+  <div class="ctrls">
+    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint.</p></div>
+    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. <b>Enter</b> presses the big button.</p></div>
+  </div>
+  <p>The <b>restart</b> button (top right) asks "sure?" first, so tap it twice.</p>
+  <div class="center"><button class="btn" id="howClose">Got it!</button></div>
+</div></div>
+
+<div class="overlay hidden" id="deadOv"><div class="card">
+  <h2>Oh noooo…</h2>
+  <canvas id="deadArt" width="320" height="220"></canvas>
+  <p id="deadMsg"></p>
+  <div class="newbest" id="deadScore"></div>
+  <div class="best" id="deadBest"></div>
+  <div class="btnrow">
+    <button class="btn" id="againBtn">Try again</button>
+    <button class="btn small" id="deadMenuBtn">Main menu</button>
+  </div>
+</div></div>
+
+<div class="overlay hidden" id="boardOv"><div class="card board">
+  <h2>Top 10</h2>
+  <div class="diffs" id="boardDiffs">
+    <button class="diff" data-b="easy">Easy</button>
+    <button class="diff" data-b="normal">Normal</button>
+    <button class="diff" data-b="hard">Hard</button>
+  </div>
+  <div class="lbnote" id="boardNote"></div>
+  <div class="t10" id="t10"></div>
+  <button class="btn small" id="boardBack">Back</button>
+</div></div>
+
+<div class="entry hidden" id="entry">
+  <div class="entrymsg" id="entryMsg"></div>
+  <canvas id="entryArt" class="entryart" width="280" height="184"></canvas>
+  <p id="entryAsk">Pop in your 3 letters:</p>
+  <div class="initials" id="initials">
+    <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="First letter">
+    <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Second letter">
+    <input maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Third letter" enterkeyhint="done">
+  </div>
+  <button class="btn" id="saveBtn">Save my score!</button>
+  <div class="lbnote" id="saveNote"></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const VERSION = '1.0';
+const TAU = Math.PI * 2, D = Math.PI / 180;
+const FONT = "'Gaegu','Comic Sans MS',cursive";
+const INK = '#111';
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const ease = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
+const $ = id => document.getElementById(id);
+
+// ---------- Tuning (world units; the runner is ~95 units tall, 50 units = 1 metre) ----------
+const G = 2000;                    // gravity
+const JUMP_V = 620;                // jump: up to ~96 high, ~0.62s in the air
+const SPRINT_JUMP_V = 740;         // jump from a sprint: up to ~137 high
+const JUMP_CUT = 0.5;              // let go of jump early for a smaller hop
+const SPRINT_ADD = 170;            // sprint speed on top of the screen speed
+const STAMINA = 1.1, RECHARGE = 0.5;   // seconds of sprint, refilled per second
+const STEP = 14;                   // small bumps you just run up
+const HW = 8;                      // half the runner's width
+const UNIT_M = 50;
+const HOME = 0.38;                 // your spot: just left of centre
+const FALL_MEDIUM = 60, FALL_LARGE = 170;   // landing styles: small hop / touch down / roll
+const LAND_T = 0.28, ROLL_T = 0.62;
+const FL_START = 0.45, FL_LIFT = 15;       // running: time and height with both feet off the ground
+const DIFFS = {                            // v0 start speed, ramp speed gain per second, vmax top speed, gap/wall: obstacle size
+  easy:   { v0:200, ramp:1.0, vmax:420, gap:0.85, wall:0.85 },
+  normal: { v0:230, ramp:1.5, vmax:500, gap:1,    wall:1 },
+  hard:   { v0:260, ramp:2.2, vmax:580, gap:1.1,  wall:1.08 },
+};
+let diffKey = 'normal';
+try { const s = localStorage.getItem('run_diff'); if (DIFFS[s]) diffKey = s; } catch (_) {}
+let DIFF = DIFFS[diffKey];
+
+// ---------- Canvas / sizing ----------
+const cv = $('game'), ctx = cv.getContext('2d');
+let W = 0, H = 0, DPR = 1, SAFE = { t:0, r:0, b:0, l:0 };
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  const cs = getComputedStyle($('safe'));
+  SAFE = { t:parseFloat(cs.paddingTop)||0, r:parseFloat(cs.paddingRight)||0, b:parseFloat(cs.paddingBottom)||0, l:parseFloat(cs.paddingLeft)||0 };
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(resize, 150));
+resize();
+// world scale: show at least ~480 units of height and ~680 units of width (portrait phones see further ahead)
+const scale = () => Math.min(H / 480, W / 680);
+const groundLine = () => H * (W < H ? 0.66 : 0.72);   // where the ground you're on sits on screen
+
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function hash(n) { const x = Math.sin(n * 127.1 + 11.7) * 43758.5453; return x - Math.floor(x); }
+
+// ---------- Doodle primitives (from the Evolution Game) ----------
+function line(g, x1, y1, x2, y2, rng, j = 0.08) {
+  const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy) || 1, o = (rng() - 0.5) * L * j * 2;
+  g.beginPath(); g.moveTo(x1, y1);
+  g.quadraticCurveTo((x1 + x2) / 2 - dy / L * o, (y1 + y2) / 2 + dx / L * o, x2, y2); g.stroke();
+}
+function rrect(g, x, y, w, h, rr) {
+  g.beginPath(); g.moveTo(x + rr, y); g.lineTo(x + w - rr, y); g.arcTo(x + w, y, x + w, y + rr, rr);
+  g.lineTo(x + w, y + h - rr); g.arcTo(x + w, y + h, x + w - rr, y + h, rr); g.lineTo(x + rr, y + h);
+  g.arcTo(x, y + h, x, y + h - rr, rr); g.lineTo(x, y + rr); g.arcTo(x, y, x + rr, y, rr); g.closePath();
+}
+function bar(g, x, y, w, h, frac, rng) {
+  frac = clamp(frac, 0, 1);
+  g.save(); rrect(g, x, y, w, h, h / 2); g.fillStyle = '#fff'; g.fill(); g.clip();
+  const fw = w * frac;
+  if (fw > 0.5) {
+    g.beginPath(); g.rect(x, y, fw, h); g.clip();
+    g.lineWidth = 1.8; g.beginPath();
+    for (let i = -h; i < fw + h; i += 4.5) { g.moveTo(x + i, y + h); g.lineTo(x + i + h, y); }
+    g.stroke();
+  }
+  g.restore();
+  if (fw > 2 && fw < w - 2) { g.save(); g.lineWidth = 2; line(g, x + fw, y + 1, x + fw, y + h - 1, rng, 0.05); g.restore(); }
+  g.save(); g.lineWidth = 2.5; rrect(g, x + (rng() - 0.5), y + (rng() - 0.5), w, h, h / 2); g.stroke();
+  g.lineWidth = 1; rrect(g, x + (rng() - 0.5) * 2.5, y + (rng() - 0.5) * 2.5, w, h, h / 2); g.stroke(); g.restore();
+}
+
+// ---------- The runner: poses (approved animation sample, round 3) ----------
+// angles in degrees: 0 = straight down, + = forward. nod tilts the head back to look ahead.
+const L = {torso: 30, neck: 3, head: 15, thigh: 23, shin: 23, uarm: 18, farm: 17};
+function runPose(p, amp = 1, lean = 14) {
+  const f = p * TAU;
+  const leg = ph => {
+    const th = 6 + 42 * amp * Math.sin(ph);
+    const bend = 10 + 105 * Math.pow(Math.max(0, Math.cos(ph)), 1.3) + 8 * Math.pow(Math.max(0, -Math.cos(ph)), 6);
+    return [th, th - bend];
+  };
+  const arm = ph => { const ua = -48 * amp * Math.sin(ph); return [ua, ua + 88 + 12 * Math.sin(ph)]; };
+  return {lean, legs: [leg(f), leg(f + Math.PI)], arms: [arm(f), arm(f + Math.PI)]};
+}
+function airPose(p, a) {           // air-running legs + arms circling forwards; a = near arm angle
+  const r = runPose(p, 1.25, 8);
+  r.arms = [[a, a - 25], [a + 180, a + 155]];
+  return r;
+}
+const TUCK   = {lean: 82, legs: [[112, -48], [98, -62]], arms: [[22, -55], [6, -68]]};
+const REACH  = {lean: 24, legs: [[48, 28], [-20, -70]], arms: [[20, -5], [200, 175]]};
+const TOUCH  = {lean: 74, nod: 52, legs: [[80, -28], [10, -80]], arms: [[-15, 5], [-19, -1]]};
+const LAND_L = {lean: 47, legs: [[88, -30], [63, -45]], arms: [[22, -20], [202, 170]]};
+const HOP    = {lean: 18, legs: [[72, -28], [-32, -112]], arms: [[42, 122], [-40, 42]]};
+const SPLAT  = {lean: 60, nod: 30, legs: [[60, -10], [30, -40]], arms: [[150, 170], [-150, -170]]};
+const SIT    = {lean: -6, nod: -8, legs: [[90, 20], [80, 10]], arms: [[40, 70], [-30, 10]]};
+const wrapNear = (b, a) => b - 360 * Math.round((b - a) / 360);
+const wrapFwd = (b, a) => { const f = b - 360 * Math.ceil((b - a) / 360); return a - f <= 220 ? f : wrapNear(b, a); };
+function mix(A, B, t) {
+  const m = (a, b) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
+  return {lean: lerp(A.lean, B.lean, t), nod: lerp(A.nod || 0, B.nod || 0, t),
+          legs: [m(A.legs[0], B.legs[0]), m(A.legs[1], B.legs[1])], arms: [m(A.arms[0], B.arms[0]), m(A.arms[1], B.arms[1])]};
+}
+function mixArms(A, B, t, fwd) {   // fwd: arms only ever travel forwards round the circle
+  const P = mix(A, B, t);
+  P.arms = A.arms.map((aa, i) => { const bb = B.arms[i], off = (fwd ? wrapFwd : wrapNear)(bb[0], aa[0]) - bb[0];
+    return [lerp(aa[0], bb[0] + off, t), lerp(aa[1], bb[1] + off, t)]; });
+  return P;
+}
+function bones(P) {
+  const v = (a, l) => [Math.sin(a * D) * l, Math.cos(a * D) * l];
+  const add = (a, b) => [a[0] + b[0], a[1] + b[1]];
+  const tl = P.lean * D, up = [Math.sin(tl), -Math.cos(tl)];
+  const hip = [0, 0], sh = [up[0] * L.torso, up[1] * L.torso];
+  const hl = tl - (P.nod || 0) * D, hu = [Math.sin(hl), -Math.cos(hl)];
+  const head = [sh[0] + hu[0] * (L.neck + L.head), sh[1] + hu[1] * (L.neck + L.head)];
+  const legs = P.legs.map(([th, s]) => { const k = add(hip, v(th, L.thigh)); return [hip, k, add(k, v(s, L.shin))]; });
+  const arms = P.arms.map(([ua, fa]) => { const e = add(sh, v(ua, L.uarm)); return [sh, e, add(e, v(fa, L.farm))]; });
+  return {hip, sh, head, legs, arms, fwd: [Math.cos(hl), Math.sin(hl)]};
+}
+function transform(B, ang, piv, dx, dy, sx = 1, sy = 1) {
+  const c = Math.cos(ang), s = Math.sin(ang);
+  const T = p => { const x = p[0] - piv[0], y = p[1] - piv[1]; return [(x * c - y * s) * sx + piv[0] + dx, (x * s + y * c) * sy + piv[1] + dy]; };
+  return {hip: T(B.hip), sh: T(B.sh), head: T(B.head), legs: B.legs.map(l => l.map(T)), arms: B.arms.map(l => l.map(T)),
+          fwd: [B.fwd[0] * c - B.fwd[1] * s, B.fwd[0] * s + B.fwd[1] * c], hsx: sx, hsy: sy};
+}
+function lowest(B) {
+  let m = B.head[1] + L.head;
+  [...B.legs, ...B.arms].forEach(l => l.forEach(p => { m = Math.max(m, p[1]); }));
+  return m;
+}
+const HIP_H = (() => { const b = bones(runPose(0.5)); return b.legs[0][2][1]; })();   // hip height above the feet mid-stride
+
+function pl(g, pts, w) { g.lineWidth = w; g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); g.stroke(); }
+// face: 'happy' (sparkly eyes + smile), 'oops' (> < eyes + little o), 'dizzy' (swirly eyes)
+function drawRunner(g, B, face = 'happy', k = 1) {
+  g.strokeStyle = INK; g.lineCap = 'round'; g.lineJoin = 'round';
+  pl(g, B.arms[1], 3.6 * k); pl(g, B.legs[1], 3.8 * k);
+  pl(g, [B.hip, B.sh], 4.6 * k);
+  pl(g, B.legs[0], 4.6 * k); pl(g, B.arms[0], 4.4 * k);
+  const hsx = B.hsx || 1, hsy = B.hsy || 1;
+  g.lineWidth = 4.2 * k; g.beginPath(); g.ellipse(B.head[0], B.head[1], L.head * hsx, L.head * hsy, 0, 0, TAU); g.fillStyle = '#fff'; g.fill(); g.stroke();
+  const f = B.fwd, up = [f[1], -f[0]], q = Math.min(hsx, hsy) < 1 ? 0.8 : 1;
+  const P = (fw, u) => [B.head[0] + (f[0] * fw + up[0] * u) * q, B.head[1] + (f[1] * fw + up[1] * u) * q];
+  const rot = Math.atan2(f[1], f[0]);
+  g.fillStyle = INK;
+  if (face === 'happy') {
+    [[7.2, 1.4, 2.6], [-0.6, 1.8, 2.4]].forEach(([fw, u, r]) => {
+      const [x, y] = P(fw, u);
+      g.beginPath(); g.ellipse(x, y, r * q, r * 1.25 * q, rot, 0, TAU); g.fillStyle = INK; g.fill();
+      const [sx, sy] = P(fw - r * 0.3, u + r * 0.45);
+      g.beginPath(); g.arc(sx, sy, r * 0.42 * q, 0, TAU); g.fillStyle = '#fff'; g.fill();
+    });
+    const [mx, my] = P(3.4, -4.4);
+    g.lineWidth = 1.8 * k; g.beginPath(); g.arc(mx, my, 1.9 * q, rot + 0.2, rot + Math.PI - 0.2); g.stroke();
+  } else {
+    g.lineWidth = 1.9 * k;
+    [[7.2, 1.6], [-0.6, 2.0]].forEach(([fw, u], i) => {
+      const [x, y] = P(fw, u), s = 2.6 * q;
+      if (face === 'dizzy') { g.beginPath(); for (let a = 0; a < 9; a += 0.4) { const rr = s * a / 9; g.lineTo(x + Math.cos(a + i) * rr, y + Math.sin(a + i) * rr); } g.stroke(); }
+      else { const d = i ? 1 : -1; g.beginPath(); g.moveTo(x - s * d, y - s); g.lineTo(x + s * 0.4 * d, y); g.lineTo(x - s * d, y + s); g.stroke(); }
+    });
+    const [mx, my] = P(3.4, -5);
+    g.beginPath(); g.ellipse(mx, my, 1.6 * q, 2.0 * q, rot, 0, TAU); g.stroke();
+  }
+}
+
+// ---------- Game state ----------
+let state = 'start', time = 0, runT = 0;
+let R, cam, segs, genX, genH, lastSprintX = -1e9, toasts, puffs, nextMilestone, deathT, deathCause;
+let bestNow = 0, bestAtStart = 0;
+const input = { jump:false, sprint:false, jumpPressed:false };
+
+function resetGame() {
+  cam = { x:-W / scale() * HOME, v:DIFF.v0, gy:0 };
+  segs = []; genX = -2000; genH = 0; lastSprintX = -1e9; toasts = []; puffs = [];
+  addSeg(2000 + 900, 0);                   // a nice long flat start
+  R = { x:0, y:0, vx:DIFF.v0, vy:0, ground:true, coyote:0, jumpBuf:0, cut:false, sprinting:false, stamina:STAMINA,
+        apexY:0, mode:'run', p:0, mt:0, airT:0, armA:0, sink:0, lastGround:0, score:0, newBest:false, dist:0, lastP:null };
+  runT = 0; nextMilestone = 100; deathT = 0; deathCause = '';
+  bestNow = bestAtStart = loadBest(diffKey);
+  gen();
+}
+function addSeg(len, h) { segs.push({ x0:genX, x1:genX + len, h }); genX += len; if (h !== null) genH = h; }
+
+// ---------- Level: built a little ahead of the screen, always jumpable ----------
+function gen() {
+  const ahead = cam.x + W / scale() + 900;
+  while (genX < ahead) addChunk();
+  while (segs.length > 2 && segs[1].x1 < cam.x - 400) segs.shift();
+}
+function addChunk() {
+  const v = Math.min(DIFF.vmax, cam.v + DIFF.ramp * Math.max(0, genX - R.x) / cam.v);   // screen speed when you get here
+  const prog = clamp(R.dist / 1500, 0, 1), rnd = Math.random;
+  addSeg((160 + rnd() * 320) * (1 - 0.35 * prog) + v * 0.5, genH);            // room to land and line up
+  const jumpT = 2 * JUMP_V / G, sprintT = 2 * SPRINT_JUMP_V / G;
+  const gapMax = Math.min(0.85, 0.66 * DIFF.gap) * v * jumpT;                    // a normal jump clears this with room to spare
+  const sGapMax = 0.74 * (v + SPRINT_ADD) * sprintT;                             // a sprint jump clears this
+  const wallMax = 0.75 * DIFF.wall * JUMP_V * JUMP_V / (2 * G);                  // ~72
+  const sWallMax = Math.min(0.8 * DIFF.wall, 0.82) * SPRINT_JUMP_V * SPRINT_JUMP_V / (2 * G);   // ~110
+  const pick = [['hole', 3], ['wall', 2.4], ['drop', 1.6], ['holeDown', 1.2], ['holeUp', 0.8 * prog],
+                ['steps', 0.8], ['sprintHole', 1.4 * clamp((prog - 0.1) * 4, 0, 1)], ['sprintWall', 1.1 * clamp((prog - 0.2) * 4, 0, 1)]];
+  // sprint obstacles are spaced out so your sprint has time to fill back up
+  if (genX - lastSprintX < v * (STAMINA / RECHARGE + 1.2)) { pick[6][1] = 0; pick[7][1] = 0; }
+  let sum = pick.reduce((a, b) => a + b[1], 0), r = rnd() * sum, kind = 'hole';
+  for (const [k, w] of pick) { if ((r -= w) <= 0) { kind = k; break; } }
+  const MAXH = 340;
+  if ((kind === 'wall' || kind === 'sprintWall' || kind === 'steps' || kind === 'holeUp') && genH > MAXH - 120) kind = 'drop';
+  if ((kind === 'drop' || kind === 'holeDown') && genH < 70) kind = 'wall';
+  const between = (a, b) => a + rnd() * (b - a);
+  if (kind === 'sprintHole' || kind === 'sprintWall') lastSprintX = genX;
+  if (kind === 'hole') addSeg(between(55, Math.max(60, gapMax * (0.55 + 0.45 * prog))), null);
+  else if (kind === 'sprintHole') addSeg(between(gapMax * 1.05, Math.max(gapMax * 1.1, sGapMax)), null);
+  else if (kind === 'wall') { genH += between(30, wallMax * (0.6 + 0.4 * prog)); }
+  else if (kind === 'sprintWall') { genH += between(wallMax * 1.1, sWallMax); }
+  else if (kind === 'drop') { genH -= Math.min(genH, between(70, 250)); }
+  else if (kind === 'holeDown') { addSeg(between(55, gapMax * 0.9), null); const dh = Math.min(genH, between(60, 200)); genH -= dh; }
+  else if (kind === 'holeUp') { addSeg(between(50, gapMax * 0.6), null); genH += between(10, wallMax * 0.45); }
+  else if (kind === 'steps') { const n = 2 + Math.floor(rnd() * 2); for (let i = 0; i < n; i++) { genH += between(30, wallMax * 0.75); addSeg(between(110, 170) + v * 0.15, genH); } }
+}
+function segsIn(a, b, fn) { for (const s of segs) { if (s.x1 <= a) continue; if (s.x0 >= b) break; fn(s); } }
+// the highest ground under your feet that you can stand on (not a wall above you)
+function support(x, maxH) {
+  let best = null;
+  segsIn(x - HW + 2, x + HW - 2, s => { if (s.h !== null && s.h <= maxH && (best === null || s.h > best)) best = s.h; });
+  return best;
+}
+function lowestGroundInView() {
+  let m = Infinity; segsIn(cam.x, cam.x + W / scale(), s => { if (s.h !== null) m = Math.min(m, s.h); });
+  return m === Infinity ? R.lastGround : m;
+}
+// where (and when) you'll land if you keep going: a quick look ahead along your jump
+function predictLanding() {
+  let x = R.x, y = R.y, vy = R.vy;
+  const dt = 1 / 60;
+  for (let t = dt; t < 2.5; t += dt) {
+    const py = y; vy -= G * dt; y += vy * dt; x += R.vx * dt;
+    if (vy <= 0) { const s = support(x, py + STEP); if (s !== null && y <= s) return { t, h:s }; }
+    if (y < lowestGroundInView() - 300) return null;
+  }
+  return null;
+}
+
+// ---------- Update ----------
+function update(dt) {
+  if (state !== 'play' && state !== 'dying') return;
+  const s = scale(), vw = W / s;
+  if (state === 'dying') { updateDying(dt); return; }
+  runT += dt;
+  cam.v = Math.min(DIFF.vmax, DIFF.v0 + DIFF.ramp * runT);
+  cam.x += cam.v * dt;
+  gen();
+  const rel = R.x - cam.x, home = vw * HOME;
+
+  // sprint and pace
+  if (input.jumpPressed) { R.jumpBuf = 0.12; input.jumpPressed = false; }
+  if (R.ground) {
+    R.sprinting = input.sprint && R.stamina > 0.05;
+    if (R.sprinting) {                          // zoom ahead (but never off the front of the screen)
+      R.vx = cam.v + SPRINT_ADD * clamp((vw * 0.82 - rel) / 60, 0, 1); R.stamina = Math.max(0, R.stamina - dt); R.sprintT = 0;
+    } else R.vx = cam.v + clamp((home - rel) * 1.6, -90, 150);   // drift back to your spot (or catch up)
+  } else R.sprinting = false;
+  R.sprintT = (R.sprintT || 0) + dt;
+  if (!R.sprinting) R.stamina = Math.min(STAMINA, R.stamina + RECHARGE * dt * (input.sprint ? 0.3 : 1));
+
+  // jump (a moment of grace after running off an edge, and presses just before landing still count)
+  R.jumpBuf -= dt; R.coyote -= dt;
+  if (R.jumpBuf > 0 && (R.ground || R.coyote > 0)) {      // you can jump out of a landing or a roll too
+    const fast = R.sprinting || R.sprintT < 0.25 || R.vx > cam.v + 80;   // a sprint jump, even a split second after letting go
+    R.vy = fast ? SPRINT_JUMP_V : JUMP_V; R.ground = false; R.coyote = 0; R.jumpBuf = 0; R.cut = false;
+    if (R.mode !== 'air') enterAir();
+    R.apexY = R.y; R.airT = 0;
+  }
+  if (!R.ground && !input.jump && R.vy > 0 && !R.cut) { R.vy *= JUMP_CUT; R.cut = true; }
+
+  // move sideways, stopping at walls
+  let nx = R.x + R.vx * dt, blocked = false;
+  segsIn(R.x - HW, nx + HW + 1, sg => {
+    if (sg.h !== null && sg.h > R.y + STEP && sg.x0 > R.x - HW * 0.5 && nx + HW > sg.x0) { nx = Math.min(nx, sg.x0 - HW); blocked = true; }   // also pushes you back out if you clip a corner
+  });
+  R.x = nx; R.blocked = blocked;
+
+  // up and down
+  if (R.ground) {
+    const sp = support(R.x, R.y + STEP);
+    if (sp === null || sp < R.y - 2) { R.ground = false; R.coyote = 0.1; R.vy = 0; R.apexY = R.y; enterAir(); }
+    else { R.y = sp; R.lastGround = sp; }
+  }
+  if (!R.ground) {
+    const py = R.y;
+    R.vy -= G * dt; R.y += R.vy * dt; R.airT += dt; R.apexY = Math.max(R.apexY, R.y);
+    if (R.vy <= 0) {
+      const sp = support(R.x, py + STEP);      // coming down just short of a ledge? step up onto it, like running does
+      if (sp !== null && R.y <= sp) { R.y = sp; R.ground = true; R.lastGround = sp; land(R.apexY - sp); }
+    }
+  }
+  R.p += (R.mode === 'air' ? 3.0 : 2.6 * Math.pow(Math.max(0.5, R.vx / 230), 0.6)) * dt;
+  if (R.mode === 'land') { R.mt += dt; if (R.mt > LAND_T) R.mode = 'run'; }
+  if (R.mode === 'roll') { R.mt += dt; if (R.mt > ROLL_T) R.mode = 'run'; }
+  if (R.mode === 'air') updateArms(dt);
+
+  // camera height follows the ground you're on (not your jumps), and stops at the lowest ground so holes drop you out of view
+  const target = R.ground ? R.y : Math.max(Math.min(R.lastGround, R.y), lowestGroundInView());
+  cam.gy += (target - cam.gy) * Math.min(1, dt * (R.ground ? 4 : 2.5));
+
+  // score: metres run
+  R.dist = Math.max(R.dist, R.x / UNIT_M);
+  addScoreTo(Math.floor(R.dist));
+  if (R.dist >= nextMilestone) { toast(`${nextMilestone} m!` + (nextMilestone % 500 === 0 ? ' Amazing!' : '')); nextMilestone += 100; }
+
+  // game over: squished against the left edge, or down a hole
+  if (R.x - HW <= cam.x + 2) die('squish');
+  else if (!R.ground && R.y < cam.gy - (H - groundLine()) / s - 110) die('hole');
+  toasts.forEach(t => t.life -= dt); toasts = toasts.filter(t => t.life > 0);
+}
+function enterAir() {
+  R.mode = 'air'; R.airT = 0;
+  R.armA = runPose(R.p).arms[0][0];
+}
+function land(fall) {
+  if (fall < FALL_MEDIUM) { R.mode = 'run'; }
+  else if (fall < FALL_LARGE) { R.mode = 'land'; R.mt = 0; }
+  else { R.mode = 'roll'; R.mt = 0; puff(R.x + 10, R.y, 4); }
+  if (fall >= FALL_MEDIUM) puff(R.x, R.y, fall >= FALL_LARGE ? 6 : 3);
+}
+// arms circle forwards; the speed is tuned on the way down so the circle finishes exactly in the landing pose
+function updateArms(dt) {
+  const pr = predictLanding();
+  let rate = 430;
+  if (pr) {
+    const fall = R.apexY - pr.h, LP = fall >= FALL_LARGE ? LAND_L : fall >= FALL_MEDIUM ? REACH : null;
+    if (LP && R.vy < 0) {
+      let need = ((R.armA - LP.arms[0][0]) % 360 + 360) % 360;
+      if (need / pr.t < 220) need += 360;
+      rate = clamp(need / Math.max(pr.t, 0.02), 150, 1100);
+    }
+    R.pred = { t:pr.t, h:pr.h, LP };
+  } else R.pred = null;
+  R.armA -= rate * dt;
+}
+function updateDying(dt) {
+  deathT += dt;
+  if (deathCause === 'hole') { R.vy -= G * dt; R.y += R.vy * dt; R.x += R.vx * 0.3 * dt; R.armA -= 900 * dt; R.p += 6 * dt; }
+  puffs.forEach(p => { p.life -= dt; p.x += p.vx * dt; p.y += p.vy * dt; });
+  puffs = puffs.filter(p => p.life > 0);
+}
+function puff(x, y, n) { for (let i = 0; i < n; i++) puffs.push({ x, y:y + 4, vx:(Math.random() - 0.3) * 120, vy:20 + Math.random() * 60, r:4 + Math.random() * 5, life:0.4 + Math.random() * 0.3, max:0.7 }); }
+function toast(text) { toasts.push({ text, life:2, max:2 }); }
+
+// ---------- Score & best ----------
+function loadBest(k) { try { return parseInt(localStorage.getItem('run1_best_' + k), 10) || 0; } catch (_) { return 0; } }
+function saveBest() { if (R.score >= bestNow && R.score > 0) try { localStorage.setItem('run1_best_' + diffKey, String(R.score)); } catch (_) {} }
+function addScoreTo(n) {
+  if (n <= R.score) return;
+  R.score = n;
+  if (R.score > bestNow) { bestNow = R.score; if (!R.newBest && bestAtStart > 0) toast('New high score!'); R.newBest = true; }
+}
+window.addEventListener('pagehide', () => { if (R && state === 'play') saveBest(); });
+
+// ---------- Drawing ----------
+function figureFor(Rn) {
+  const run = runPose(Rn.p, Rn.sprinting ? 1.15 : 1, Rn.sprinting ? 20 : 14);
+  let P = run, ang = 0, sink = 0, face = 'happy', sx = 1, sy = 1;
+  if (Rn.mode === 'air' || Rn.mode === 'dead-fall') {
+    const hop = mix(run, HOP, 0.7 * ease(Rn.airT / 0.1));
+    const AP = airPose(Rn.p, Rn.armA);
+    const fall = Math.max(Rn.apexY - Rn.lastGround, Rn.pred ? Rn.apexY - Rn.pred.h : 0);   // big jumps and big drops get air-running
+    const aw = ease((Rn.airT - 0.08) / 0.16) * clamp((fall - 30) / 30, 0, 1);
+    P = mixArms(hop, AP, Math.max(aw, Rn.mode === 'dead-fall' ? 1 : 0), false);
+    if (Rn.pred && Rn.pred.LP && Rn.pred.t < 0.14 && Rn.vy < 0) P = mixArms(P, Rn.pred.LP, ease(1 - Rn.pred.t / 0.14), true);
+    if (Rn.mode === 'dead-fall') face = 'oops';
+  } else if (Rn.mode === 'land') {
+    const k = Rn.mt / LAND_T;
+    P = k < 0.4 ? mixArms(REACH, TOUCH, ease(k / 0.4), true) : mixArms(TOUCH, run, ease((k - 0.4) / 0.6), true);
+    sink = 1 - ease((k - 0.55) / 0.45);
+  } else if (Rn.mode === 'roll') {
+    const k = Rn.mt / ROLL_T;
+    if (k < 0.2) P = mixArms(LAND_L, TUCK, ease(k / 0.2), true);
+    else if (k > 0.72) P = mix(TUCK, run, ease((k - 0.72) / 0.28));
+    else P = TUCK;
+    sink = 1 - ease((k - 0.72) / 0.28);
+    ang = ease(clamp((k - 0.05) / 0.85, 0, 1)) * TAU;
+  } else if (Rn.mode === 'squish') { P = SPLAT; face = 'dizzy'; sx = 0.45; sink = 1; }
+  const B0 = bones(P);
+  const all = [B0.head, ...B0.legs.flat(), ...B0.arms.flat()];
+  const piv = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length];
+  const B1 = transform(B0, ang, piv, 0, 0, sx, sy);
+  const drop = lowest(B1);
+  let hipUp;
+  if (Rn.mode === 'air' || Rn.mode === 'dead-fall') hipUp = HIP_H;
+  else {
+    const f = Rn.p * TAU, fl = clamp((Math.abs(Math.sin(f)) - FL_START) / (1 - FL_START), 0, 1);
+    const lift = (Rn.sprinting ? FL_LIFT * 1.2 : FL_LIFT) * Math.sin(fl * Math.PI / 2);
+    hipUp = lerp(drop + lift, drop, clamp(sink, 0, 1));
+  }
+  return { B1, hipUp, face };
+}
+// world -> screen: x right, y up (the canvas is flipped by hand: screen y = base - (y - cam.gy) * s)
+function render() {
+  const g = ctx, s = scale();
+  g.setTransform(DPR, 0, 0, DPR, 0, 0);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+  if (!R) return;
+  const base = groundLine(), vw = W / s;
+  const SX = x => (x - cam.x) * s, SY = y => base - (y - cam.gy) * s;
+  g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK;
+  drawClouds(g, s, base);
+  // ground
+  const rng = mulberry(91);
+  const list = []; segsIn(cam.x - 20, cam.x + vw + 20, sg => list.push(sg));
+  const idx0 = segs.indexOf(list[0]);
+  list.forEach((sg, i) => {
+    if (sg.h === null || sg.x1 - sg.x0 < 0.5) return;
+    const prev = segs[idx0 + i - 1], next = segs[idx0 + i + 1];
+    const x0 = SX(sg.x0), x1 = SX(sg.x1), y = SY(sg.h), bottom = H + 10;
+    g.lineWidth = Math.max(2.5, 4 * s);
+    g.beginPath(); g.moveTo(x0, y);
+    for (let xx = sg.x0; xx < sg.x1; xx += 22) g.lineTo(SX(xx), y + Math.sin(xx * 0.05) * 0.8 * s);
+    g.lineTo(x1, y); g.stroke();
+    const side = (nb, x) => { const to = !nb || nb.h === null ? bottom : SY(nb.h); if (to > y + 1) { g.beginPath(); g.moveTo(x, y); g.lineTo(x + (nb && nb.h !== null ? 0 : (x === x0 ? -1.5 : 1.5)), to); g.stroke(); } };
+    side(prev, x0); side(next, x1);
+    // dirt dashes and little grass tufts
+    g.lineWidth = Math.max(1.5, 2.5 * s);
+    const cell = 46;
+    for (let cx = Math.ceil(Math.max(sg.x0, cam.x - 50) / cell) * cell; cx < Math.min(sg.x1, cam.x + vw + 50); cx += cell) {
+      for (let row = 0; row < 6; row++) {
+        const n = cx * 0.37 + row * 13.1, hx = cx + hash(n) * 26, len = 6 + hash(n + 3) * 10;
+        if (hx < sg.x0 + 6 || hx + len > sg.x1 - 6) continue;
+        const yy = y + (14 + row * 34 + hash(n + 7) * 20) * s;
+        if (yy > H + 5) break;
+        g.beginPath(); g.moveTo(SX(hx), yy); g.lineTo(SX(hx + len), yy); g.stroke();
+      }
+      if (hash(cx * 0.91) < 0.35) {
+        const tx = SX(cx + 10);
+        if (cx + 4 > sg.x0 && cx + 18 < sg.x1) { g.beginPath(); g.moveTo(tx - 4 * s, y); g.lineTo(tx - 6 * s, y - 7 * s); g.moveTo(tx, y); g.lineTo(tx, y - 9 * s); g.moveTo(tx + 4 * s, y); g.lineTo(tx + 7 * s, y - 6 * s); g.stroke(); }
+      }
+    }
+  });
+  // dust puffs
+  g.lineWidth = Math.max(1.5, 2.2 * s);
+  puffs.forEach(p => { g.globalAlpha = clamp(p.life / p.max, 0, 1); g.beginPath(); g.arc(SX(p.x), SY(p.y), p.r * s * (1.6 - p.life / p.max), 0, TAU); g.stroke(); });
+  g.globalAlpha = 1;
+  // runner
+  const { B1, hipUp, face } = figureFor(R);
+  const hx = SX(R.x), hy = SY(R.y + hipUp);
+  g.save(); g.translate(hx, hy); g.scale(s, s); drawRunner(g, B1, face); g.restore();
+  if (state === 'play' || state === 'dying') drawHUD();
+}
+function drawClouds(g, s, base) {
+  g.save(); g.strokeStyle = '#c8c8c8'; g.lineWidth = Math.max(1.5, 2.4 * s);
+  const par = 0.25, cw = 520, off = cam.x * par;
+  for (let i = Math.floor(off / cw) - 1; i < Math.floor(off / cw) + W / s / cw + 2; i++) {
+    const cx = (i * cw + hash(i) * 260 - off) * s, cy = base - (240 + hash(i + 5) * 150 - cam.gy * 0.2) * s, k = (0.7 + hash(i + 9) * 0.6) * s;
+    if (cy < -60) continue;
+    g.beginPath();
+    g.arc(cx, cy, 18 * k, Math.PI * 0.9, Math.PI * 1.9); g.arc(cx + 26 * k, cy - 8 * k, 22 * k, Math.PI * 1.1, Math.PI * 1.95);
+    g.arc(cx + 52 * k, cy, 16 * k, Math.PI * 1.2, Math.PI * 2.1);
+    g.lineTo(cx - 14 * k, cy + 10 * k); g.closePath(); g.stroke();
+  }
+  g.restore();
+}
+function drawHUD() {
+  const g = ctx, rng = mulberry(777 + Math.floor(time * 7) * 31);
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK; g.fillStyle = INK;
+  const pad = 12, Lx = SAFE.l + pad, T = SAFE.t + pad, Rx = W - SAFE.r - pad, small = W < 420 || H < 420;
+  g.textBaseline = 'top'; g.textAlign = 'left';
+  g.font = `700 ${small ? 30 : 38}px ${FONT}`; g.fillText(`${R.score.toLocaleString()} m`, Lx, T - 4);
+  g.font = `700 ${small ? 15 : 17}px ${FONT}`; g.fillStyle = R.newBest ? INK : '#8a8a8a';
+  g.fillText(R.newBest ? 'new best!' : `best ${bestNow.toLocaleString()} m`, Lx + 2, T + (small ? 28 : 36));
+  // sprint meter, top right under the restart button
+  g.fillStyle = INK;
+  const bw = small ? 90 : 120, bh = 14, bx = Rx - bw, by = T + 60;
+  g.font = `700 16px ${FONT}`; g.textAlign = 'right'; g.textBaseline = 'bottom';
+  g.fillText(R.stamina >= STAMINA - 0.01 ? 'sprint ready!' : 'sprint', Rx - 2, by - 2);
+  bar(g, bx, by, bw, bh, R.stamina / STAMINA, rng);
+  // toasts
+  if (toasts.length) {
+    const t = toasts[toasts.length - 1], a = Math.min(1, t.life / 0.4, (t.max - t.life) / 0.2 + 0.2);
+    g.globalAlpha = a; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `700 ${small ? 26 : 32}px ${FONT}`; g.fillText(t.text, W / 2, T + (small ? 92 : 70) - (1 - a) * 10);
+    g.globalAlpha = 1;
+  }
+  // touch pads (phones): left half sprints, right half jumps
+  if (touch && state === 'play') {
+    const ph = Math.min(64, H * 0.12), pw = Math.min(150, W * 0.36), py = H - SAFE.b - ph - 40;   // above the title at the bottom
+    const padAt = (x, label, on) => {
+      g.save(); g.setLineDash([7, 7]); g.lineWidth = 2.5; g.strokeStyle = on ? INK : '#9a9a9a';
+      rrect(g, x, py, pw, ph, 16); g.fillStyle = on ? '#ececec' : '#fff'; g.fill(); g.stroke(); g.restore();
+      g.fillStyle = on ? INK : '#777'; g.font = `700 ${small ? 22 : 26}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText(label, x + pw / 2, py + ph / 2 + 2);
+    };
+    padAt(SAFE.l + 14, 'sprint', input.sprint); padAt(W - SAFE.r - 14 - pw, 'jump', input.jump);
+  }
+  g.restore();
+}
+
+// ---------- Overlay art ----------
+function mini(canvas, fn) {
+  const g = canvas.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, canvas.width, canvas.height);
+  g.setTransform(2, 0, 0, 2, 0, 0); g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK; g.lineWidth = 2.6; fn(g);
+}
+// a runner pose drawn standing on y = gy (in the mini canvas's half-size units)
+function miniRunner(g, x, gy, k, P, face = 'happy', lift = 0) {
+  const B = bones(P), drop = lowest(B);
+  g.save(); g.translate(x, gy - (drop + lift) * k); g.scale(k, k); drawRunner(g, B, face); g.restore();
+}
+function drawOverlayArt() {
+  if (!$('startOv').classList.contains('hidden')) mini($('startArt'), g => {
+    const k = 0.85, gy = 96, sc = (time * 140) % 46;
+    g.lineWidth = 2.6; g.beginPath(); g.moveTo(10, gy); g.lineTo(190, gy); g.stroke();
+    g.lineWidth = 1.8; for (let i = 0; i < 5; i++) { const x = 190 - ((i * 46 + sc) % 230); if (x > 14 && x < 180) { g.beginPath(); g.moveTo(x, gy + 8); g.lineTo(x + 9, gy + 8); g.stroke(); } }
+    const p = time * 2.6, f = p * TAU, fl = clamp((Math.abs(Math.sin(f)) - FL_START) / (1 - FL_START), 0, 1);
+    miniRunner(g, 96, gy, k, runPose(p), 'happy', FL_LIFT * Math.sin(fl * Math.PI / 2));
+  });
+  if (!$('howOv').classList.contains('hidden')) mini($('howArt'), g => {
+    const gy = 96, k = 0.56;
+    g.lineWidth = 2.6;
+    g.beginPath(); g.moveTo(8, gy); g.lineTo(96, gy); g.lineTo(96, 112); g.moveTo(150, 112); g.lineTo(150, gy); g.lineTo(200, gy); g.lineTo(200, gy - 36); g.lineTo(292, gy - 36); g.stroke();
+    const p = time * 2.6, cyc = (time * 0.6) % 1, arc = Math.sin(cyc * Math.PI);
+    miniRunner(g, 40 + cyc * 160, gy - arc * 30, k, cyc < 0.08 || cyc > 0.95 ? runPose(p) : airPose(p * 1.2, 40 - cyc * 360));
+    g.font = `700 14px ${FONT}`; g.fillStyle = INK; g.textAlign = 'center';
+    g.fillText('jump!', 123, 22); g.fillText('sprint for', 246, gy - 66); g.fillText('big walls!', 246, gy - 52);
+  });
+  if (!$('deadOv').classList.contains('hidden')) mini($('deadArt'), g => {
+    const gy = 92, k = 1.05;
+    g.lineWidth = 2.6; g.beginPath(); g.moveTo(20, gy); g.lineTo(140, gy); g.stroke();
+    miniRunner(g, 82, gy, k, SIT, 'dizzy');
+    g.lineWidth = 2; for (let i = 0; i < 3; i++) { const a = time * 3 + i * TAU / 3; g.beginPath(); g.arc(82 + Math.cos(a) * 22, 30 + Math.sin(a) * 6, 3, 0, TAU); g.stroke(); }
+  });
+}
+// a cheerful runner for the leaderboard spots
+function drawFit(cvs) {
+  const g = cvs.getContext('2d'), Wc = cvs.width, Hc = cvs.height;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, Wc, Hc);
+  const k = Hc / 120;
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.lineWidth = 3 * k; g.strokeStyle = INK; g.beginPath(); g.moveTo(Wc * 0.18, Hc * 0.9); g.lineTo(Wc * 0.82, Hc * 0.9); g.stroke();
+  const P = runPose(0.2, 1.1, 18), B = bones(P), drop = lowest(B);
+  g.save(); g.translate(Wc / 2 - 4 * k, Hc * 0.9 - (drop + 8) * k); g.scale(k, k); drawRunner(g, B, 'happy', 1.15); g.restore();
+}
+function drawQuestion(cvs) {
+  const g = cvs.getContext('2d'), Wc = cvs.width, Hc = cvs.height;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, Wc, Hc);
+  g.strokeStyle = '#bbb'; g.lineWidth = 3; g.setLineDash([6, 7]); g.beginPath(); g.arc(Wc / 2, Hc / 2, Hc * 0.34, 0, TAU); g.stroke(); g.setLineDash([]);
+  g.fillStyle = '#bbb'; g.font = `700 ${Math.round(Hc * 0.42)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', Wc / 2, Hc / 2 + 2);
+}
+
+// ---------- Flow ----------
+function show(id, on) { $(id).classList.toggle('hidden', !on); }
+function startRun() { show('startOv', false); show('brand', true); show('restartBtn', true); resetGame(); state = 'play'; clearInput(); }
+function toMainMenu() {
+  if (state === 'play') saveBest();
+  state = 'start'; clearInput();
+  show('deadOv', false); show('brand', false); show('restartBtn', false);
+  closeEntry(); resetGame(); refreshBoard(diffKey, true); showBestLine(); show('startOv', true);
+}
+function die(cause) {
+  if (state !== 'play') return;
+  state = 'dying'; deathCause = cause; deathT = 0; clearInput();
+  if (cause === 'squish') { R.mode = 'squish'; R.x = cam.x + HW * 0.45 + 2; puff(R.x, R.y + 40, 5); }
+  else { R.mode = 'dead-fall'; R.pred = null; }
+  saveBest();
+  $('deadMsg').textContent = cause === 'squish'
+    ? `Squish! A wall stopped you and the screen caught up after ${R.score.toLocaleString()} m.`
+    : `You fell down a hole after ${R.score.toLocaleString()} m.`;
+  $('deadScore').textContent = (R.newBest ? 'New high score! ' : 'Score: ') + `${R.score.toLocaleString()} m`;
+  $('deadBest').textContent = R.newBest ? '' : `Best on ${diffKey}: ${bestNow.toLocaleString()} m`;
+  closeEntry(); offerEntry();
+  setTimeout(() => { if (state === 'dying') { state = 'dead'; show('deadOv', true); } }, 900);
+}
+$('startBtn').onclick = startRun;
+$('againBtn').onclick = () => { closeEntry(); show('deadOv', false); resetGame(); state = 'play'; clearInput(); };
+$('deadMenuBtn').onclick = () => toMainMenu();
+$('howBtn').onclick = () => { show('startOv', false); show('howOv', true); $('howOv').querySelector('.card').scrollTop = 0; };
+$('howClose').onclick = () => { show('howOv', false); show('startOv', true); };
+
+// Restart: first tap arms it ("sure?"), second tap within a few seconds goes back to the start menu
+let restartArmed = null;
+function disarmRestart() { clearTimeout(restartArmed); restartArmed = null; $('restartBtn').classList.remove('armed'); $('restartBtn').querySelector('span').textContent = 'restart'; }
+$('restartBtn').onclick = e => {
+  e.currentTarget.blur();
+  if (!restartArmed) {
+    $('restartBtn').classList.add('armed'); $('restartBtn').querySelector('span').textContent = 'sure?';
+    restartArmed = setTimeout(disarmRestart, 2500); return;
+  }
+  disarmRestart(); toMainMenu();
+};
+$('restartBtn').addEventListener('pointerdown', e => e.stopPropagation());
+
+const touch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
+
+// ---------- Leaderboard (same setup as the Evolution Game, its own boards) ----------
+const FIREBASE = { apiKey:'AIzaSyD6hux9hQsFsfnYTGCTbo4EBDbfo8O8my8', projectId:'doodle-games-8beba' };
+const LB_ON = !!(FIREBASE.apiKey && FIREBASE.projectId);
+const BOARD = 'runner1_';                           // runner1_easy / runner1_normal / runner1_hard
+const lbCache = {};
+const fsURL = p => `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents${p}?key=${FIREBASE.apiKey}`;
+const savedName = () => { try { for (const key of ['doodle_name', 'evo_name']) { const n = localStorage.getItem(key); if (/^[A-Z]{3}$/.test(n)) return n; } } catch (_) {} return ''; };
+function loadRec(k) { try { const r = JSON.parse(localStorage.getItem('run1_bestrec_' + k)); return r && r.score > 0 ? r : null; } catch (_) { return null; } }
+function saveRec(k, r) { try { localStorage.setItem('run1_bestrec_' + k, JSON.stringify(r)); } catch (_) {} }
+async function fetchBoard(k, n = 3) {
+  const r = await fetch(fsURL(':runQuery'), { method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ structuredQuery:{ from:[{ collectionId:BOARD + k }], orderBy:[{ field:{ fieldPath:'score' }, direction:'DESCENDING' }], limit:n } }) });
+  if (!r.ok) throw new Error('board ' + r.status);
+  const out = [];
+  for (const row of await r.json()) {
+    try {
+      const f = row.document.fields, name = f.name.stringValue, score = parseInt(f.score.integerValue, 10);
+      if (!/^[A-Z]{3}$/.test(name) || !(score > 0)) continue;
+      out.push({ name, score });
+    } catch (_) {}
+  }
+  return out;
+}
+async function submitScore(k, e) {   // same document shape as the Evolution boards (muts empty, top false)
+  const r = await fetch(fsURL('/' + BOARD + k), { method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ fields:{ name:{ stringValue:e.name }, score:{ integerValue:String(e.score) },
+      muts:{ arrayValue:{} }, top:{ booleanValue:false }, v:{ stringValue:VERSION } } }) });
+  if (!r.ok) throw new Error('save ' + r.status);
+}
+function refreshBoard(k, force) {
+  if (!LB_ON) return;
+  const c = lbCache[k];
+  if (!force && c && Date.now() - c.at < 30000) return;
+  fetchBoard(k).then(list => { lbCache[k] = { list, at:Date.now() }; if (k === diffKey) showBestLine(); })
+    .catch(() => { if (k === diffKey && !lbCache[k]) { $('lbNote').textContent = 'leaderboard is napping, try again later'; } });
+}
+let boardKey = 'normal';
+function showBoard(k) {
+  boardKey = k;
+  document.querySelectorAll('#boardDiffs .diff').forEach(b => b.classList.toggle('on', b.dataset.b === k));
+  const box = $('t10'); box.innerHTML = ''; box.scrollTop = 0;
+  $('boardNote').textContent = 'loading...';
+  fetchBoard(k, 10).then(list => {
+    if (boardKey !== k) return;
+    $('boardNote').textContent = list.length ? '' : 'nobody yet. Be the first!';
+    const rec = loadRec(k);
+    for (let i = 0; i < 10; i++) {
+      const e = list[i], r = document.createElement('div');
+      r.className = 't10row' + (e ? '' : ' empty') + (e && rec && rec.name === e.name && rec.score === e.score ? ' me' : '');
+      r.innerHTML = `<i>${['1st', '2nd', '3rd'][i] || (i + 1) + 'th'}</i><canvas width="192" height="112"></canvas><b>${e ? e.name : '???'}</b><span>${e ? e.score.toLocaleString() + ' m' : ''}</span>`;
+      box.appendChild(r);
+      const c = r.querySelector('canvas'); if (e) drawFit(c); else drawQuestion(c);
+    }
+    lbCache[k] = { list:list.slice(0, 3), at:Date.now() };
+  }).catch(() => { if (boardKey === k) $('boardNote').textContent = 'leaderboard is napping, try again later'; });
+}
+$('lbMore').onclick = () => { show('startOv', false); show('boardOv', true); showBoard(diffKey); };
+$('boardBack').onclick = () => { show('boardOv', false); showBestLine(); show('startOv', true); };
+document.querySelectorAll('#boardDiffs .diff').forEach(b => b.onclick = () => showBoard(b.dataset.b));
+function showBestLine() {
+  $('lbHead').textContent = `Top 3 on ${diffKey}`;
+  const c = lbCache[diffKey], list = c ? c.list : [];
+  $('lbMore').classList.toggle('hidden', !LB_ON);
+  $('lbNote').textContent = !LB_ON ? 'leaderboard coming soon!' : c ? (list.length ? '' : 'nobody yet. Be the first!') : 'loading...';
+  const row = $('lbRow'); row.innerHTML = '';
+  ['1st', '2nd', '3rd'].forEach((place, i) => {
+    const e = list[i], d = document.createElement('div'); d.className = 'lbc' + (e ? '' : ' empty');
+    d.innerHTML = `<i>${place}</i><canvas width="168" height="112"></canvas><b>${e ? e.name : '???'}</b><span>${e ? e.score.toLocaleString() + ' m' : ''}</span>`;
+    row.appendChild(d);
+    const cvs = d.querySelector('canvas'); if (e) drawFit(cvs); else drawQuestion(cvs);
+  });
+  const rec = loadRec(diffKey), b = Math.max(loadBest(diffKey), rec ? rec.score : 0), you = $('youRow');
+  if (b > 0) {
+    const same = rec && rec.score >= b;
+    you.innerHTML = `<i>your best</i><canvas width="120" height="80"></canvas><b>${same && rec.name ? rec.name : '???'}</b><span>${b.toLocaleString()} m</span>`;
+    drawFit(you.querySelector('canvas'));
+  } else you.innerHTML = `<i>your best: no score yet on ${diffKey}</i>`;
+  refreshBoard(diffKey);
+}
+// End of a run: if you beat your own best or the top 3, ask for 3 letters
+let entryRun = null;
+const initials = () => [...document.querySelectorAll('#initials input')];
+function offerEntry() {
+  const s = R.score, k = diffKey;
+  const mine = s > 0 && s > bestAtStart, c = lbCache[k];
+  const onBoard = LB_ON && s > 0 && (!c || c.list.length < 3 || s > c.list[c.list.length - 1].score);
+  if (mine) saveRec(k, { score:s, name:savedName() });
+  const box = $('entry');
+  if (!mine && !onBoard) { box.classList.add('hidden'); return; }
+  entryRun = { k, score:s, mine };
+  $('deadBest').after(box);
+  $('entryMsg').textContent = onBoard && c ? 'You made the top 3!' : '';
+  drawFit($('entryArt'));
+  const n = savedName(); initials().forEach((inp, i) => { inp.value = n[i] || ''; inp.disabled = false; });
+  $('initials').classList.remove('hidden'); $('entryAsk').classList.remove('hidden');
+  $('saveBtn').classList.remove('hidden'); $('saveBtn').disabled = false; $('saveNote').textContent = '';
+  box.classList.remove('hidden'); $('deadOv').querySelector('.card').classList.add('entering');
+  $('againBtn').className = 'btn small';
+}
+function closeEntry() { document.querySelectorAll('.entering').forEach(c => c.classList.remove('entering')); $('entry').classList.add('hidden'); entryRun = null; $('againBtn').className = 'btn'; }
+initials().forEach((inp, i, all) => {
+  inp.addEventListener('input', () => { inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g, '').slice(-1); if (inp.value && i < 2) all[i + 1].focus(); });
+  inp.addEventListener('keydown', e => {
+    e.stopPropagation();
+    if (e.key === 'Backspace' && !inp.value && i > 0) { all[i - 1].focus(); all[i - 1].value = ''; e.preventDefault(); }
+    if (e.key === 'Enter') { e.preventDefault(); $('saveBtn').click(); }
+  });
+  inp.addEventListener('focus', () => inp.select());
+});
+$('saveBtn').onclick = async () => {
+  if (!entryRun) return;
+  const name = initials().map(i => i.value).join('');
+  if (!/^[A-Z]{3}$/.test(name)) { $('saveNote').textContent = 'three letters please!'; return; }
+  const run = entryRun; try { localStorage.setItem('doodle_name', name); } catch (_) {}
+  if (run.mine) { const r = loadRec(run.k); if (r && r.score === run.score) saveRec(run.k, { ...r, name }); }
+  $('saveBtn').disabled = true; initials().forEach(i => { i.disabled = true; i.blur(); });
+  if (LB_ON) {
+    $('saveNote').textContent = 'saving...';
+    try { await submitScore(run.k, { name, score:run.score }); $('saveNote').textContent = 'Saved! Look for it on the main menu!'; }
+    catch (_) { $('saveNote').textContent = "Couldn't reach the leaderboard, but it's saved on this device."; }
+    delete lbCache[run.k]; refreshBoard(run.k, true);
+  } else $('saveNote').textContent = 'Saved on this device!';
+  $('saveBtn').classList.add('hidden'); $('initials').classList.add('hidden'); $('entryAsk').classList.add('hidden');
+  if (entryRun === run) entryRun = null;
+};
+function setDiff(k) {
+  diffKey = k; DIFF = DIFFS[k];
+  document.querySelectorAll('#diffs .diff').forEach(b => b.classList.toggle('on', b.dataset.d === k));
+  try { localStorage.setItem('run_diff', k); } catch (_) {}
+  if (state === 'start') resetGame();
+  showBestLine();
+}
+document.querySelectorAll('#diffs .diff').forEach(b => b.onclick = () => setDiff(b.dataset.d));
+$('ctrlHint').textContent = touch ? 'Right side to jump, hold left side to sprint' : 'Space to jump, hold Shift to sprint';
+
+// ---------- Input ----------
+const ptrs = new Map();   // pointerId -> 'jump' | 'sprint'
+function syncPtrs() {
+  input.sprint = keyS.size > 0 || [...ptrs.values()].includes('sprint');
+  input.jump = keyJ.size > 0 || [...ptrs.values()].includes('jump');
+}
+const keyJ = new Set(), keyS = new Set();
+function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); input.jump = input.sprint = input.jumpPressed = false; }
+cv.addEventListener('pointerdown', e => {
+  if (state !== 'play') return;
+  const role = e.clientX < W / 2 ? 'sprint' : 'jump';
+  ptrs.set(e.pointerId, role); if (role === 'jump') input.jumpPressed = true;
+  try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+  syncPtrs(); e.preventDefault();
+});
+const endPtr = e => { ptrs.delete(e.pointerId); syncPtrs(); };
+cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
+cv.addEventListener('contextmenu', e => e.preventDefault());
+const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'], SPRINT_KEYS = ['ShiftLeft', 'ShiftRight', 'ArrowRight', 'KeyD'];
+window.addEventListener('keydown', e => {
+  if (e.code === 'Enter' || (e.code === 'Space' && state !== 'play')) {
+    for (const [ov, sel] of [['howOv', '#howClose'], ['boardOv', '#boardBack'], ['startOv', '#startBtn'], ['deadOv', '#againBtn']])
+      if (!$(ov).classList.contains('hidden')) { e.preventDefault(); document.querySelector(sel).click(); return; }
+  }
+  if (state !== 'play') return;
+  if (JUMP_KEYS.includes(e.code)) { if (!e.repeat) input.jumpPressed = true; keyJ.add(e.code); e.preventDefault(); }
+  if (SPRINT_KEYS.includes(e.code)) { keyS.add(e.code); e.preventDefault(); }
+  syncPtrs();
+});
+window.addEventListener('keyup', e => { keyJ.delete(e.code); keyS.delete(e.code); syncPtrs(); });
+window.addEventListener('blur', clearInput);
+
+// ---------- Loop ----------
+resetGame();
+setDiff(diffKey);
+/*@test-hook*/
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; time += dt;
+  update(dt);
+  render(); drawOverlayArt();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
