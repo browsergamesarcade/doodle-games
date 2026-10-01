@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Runner Game v4.0</title>
+<title>Doodle Runner Game v4.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -177,10 +177,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v4.0</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v4.1</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Runner Game</h1><div class="ver">v4.0</div>
+  <h1>Doodle Runner Game</h1><div class="ver">v4.1</div>
   <canvas id="startArt" width="400" height="220"></canvas>
   <p>Run, run, run across the rooftops!<br>Leap the gaps and hop the AC units.<br>How far can you go?</p>
   <div class="diffs" id="diffs">
@@ -219,13 +219,13 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <h3>Skill Cards</h3>
   <p>Run far enough and you'll find a <b>Skill Card</b>! Pick it up for a new move and a little bit of gear. Some cards can be upgraded later on.</p>
   <h3>Tricks</h3>
-  <p>With the <b>Trick</b> card (and its backwards cap!), press <b>trick</b> in the air to flip, spin or cartwheel. You need lots of air: a <b>sprint jump</b>, or a jump down onto a lower roof. Land it for bonus points! Leave it too late and you'll tumble, and it takes a second to get back up.</p>
+  <p>With the <b>Trick</b> card (and its backwards cap!), press <b>sprint</b> again <b>in the air</b> to flip, spin or cartwheel. You need lots of air: a <b>sprint jump</b>, or a jump down onto a lower roof. Land it for bonus points! Leave it too late and you'll tumble, and it takes a second to get back up.</p>
   <h3>Score</h3>
   <p>Every metre you run scores a point, and landed tricks score lots more. The screen slowly gets faster the further you go. Beat the <b>top 3</b> (or your own best) and pop in your 3 letters for the leaderboard!</p>
   <h3>Controls</h3>
   <div class="ctrls">
-    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint. The <b>trick</b> pad sits just above sprint.</p></div>
-    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. <b>Down</b>, <b>S</b> or <b>E</b> for a trick. <b>Enter</b> presses the big button.</p></div>
+    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint. Once you have tricks, touch the <b>left side</b> again in the air to do one.</p></div>
+    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. Once you have tricks, press sprint again <b>in the air</b> to do one. <b>Enter</b> presses the big button.</p></div>
   </div>
   <p>The <b>restart</b> button (top right) asks "sure?" first, so tap it twice.</p>
   <div class="center"><button class="btn" id="howClose">Got it!</button></div>
@@ -277,7 +277,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <script>
 (() => {
 'use strict';
-const VERSION = '4.0';
+const VERSION = '4.1';
 const TAU = Math.PI * 2, D = Math.PI / 180;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -739,7 +739,7 @@ function drawCape(g, B, gear, k = 1) {
 // ---- Skill Cards: which cards there are, when they turn up ----
 const CARD_AT = [250, 600, 1000, 1500, 2100, 2800];   // metres
 const CARDS = [
-  { id:'trick', tag:'new', name:'Trick', desc:'A trick button! Flip and spin in the air. Needs a sprint jump or a drop. Land it for points!', demo:'trick' },
+  { id:'trick', tag:'new', name:'Trick', desc:'Press sprint in the air to flip and spin! Needs a sprint jump or a drop. Land it for points!', demo:'trick' },
   { id:'trick2', needs:'trick', tag:'upgrade', name:'Trick Pro', desc:'Doubles and corks! Bigger tricks for bigger points.', demo:'trick2' },
 ];
 const gearFor = got => ({ cap: got.includes('trick2') ? 2 : got.includes('trick') ? 1 : 0 });
@@ -748,7 +748,7 @@ const gearFor = got => ({ cap: got.includes('trick2') ? 2 : got.includes('trick'
 let state = 'start', time = 0, runT = 0;
 let R, cam, segs, genX, genH, lastSprintX = -1e9, toasts, puffs, pops, nextMilestone, deathT, deathCause;
 let bestNow = 0, bestAtStart = 0;
-const input = { jump:false, sprint:false, jumpPressed:false, trick:false, trickPressed:false };
+const input = { jump:false, sprint:false, jumpPressed:false, trickPressed:false };
 
 function resetGame() {
   cam = { x:-W / baseScale() * HOME, v:DIFF.v0, gy:0, z:1 };
@@ -756,7 +756,7 @@ function resetGame() {
   addSeg(2000 + 900, 0);                   // a nice long flat start
   R = { x:0, y:0, vx:DIFF.v0, vy:0, ground:true, coyote:0, jumpBuf:0, cut:false, sprinting:false, stamina:STAMINA,
         apexY:0, mode:'run', p:0, ap:0, va:DIFF.v0, airT:0, spin:0, spinW:0, armNeed:0, airAmt:0, pT:null, pred:null, touch:null, roll:null, xf:null, lastRig:null,
-        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, trick:null, crash:null, trickPts:0, takeY:0, sJump:false, nagT:-9 };
+        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, trick:null, crash:null, trickPts:0, takeY:0, sJump:false };
   runT = 0; nextMilestone = 100; deathT = 0; deathCause = '';
   bestNow = bestAtStart = loadBest(diffKey);
   gen();
@@ -866,8 +866,8 @@ function update(dt) {
     if (R.mode !== 'air') enterAir();
     R.apexY = R.y; R.airT = 0; R.sJump = fast; R.takeY = R.y;
   }
-  if (!R.ground && !input.jump && R.vy > 0 && !R.cut) { R.vy *= JUMP_CUT; R.cut = true; }
   if (input.trickPressed) { input.trickPressed = false; tryTrick(); }
+  if (!R.ground && !input.jump && R.vy > 0 && !R.cut) { R.vy *= JUMP_CUT; R.cut = true; }
   if (R.trick) R.trick.t += dt;
 
   // move sideways, stopping at walls
@@ -934,7 +934,8 @@ function update(dt) {
 function tryTrick() {
   if (!R.got.includes('trick') || R.ground || R.trick || R.crash || state !== 'play') return;
   const pr = predictLanding(), drop = pr ? R.takeY - pr.h : 999;
-  if (!R.sJump && drop < 50) { if (time - R.nagT > 2.5) { R.nagT = time; pop('need more air!', true); } return; }
+  if (!R.sJump && drop < 50) return;                   // a little hop: sprint just does nothing in the air
+  if (pr && pr.t < 0.2) return;                        // about to land: that's a sprint press for the landing, not a trick
   R.trick = { tr: pickTrick(R.got.includes('trick2'), pr ? pr.t : 9), t: 0 };
   R.cut = true;                                        // committed: the jump keeps its full height
 }
@@ -1247,19 +1248,12 @@ function drawHUD() {
       g.fillStyle = on ? INK : '#777'; g.font = `700 ${small ? 22 : 26}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(label, x + pw / 2, py + ph / 2 + 2);
     };
-    padAt(SAFE.l + 14, 'sprint', input.sprint); padAt(W - SAFE.r - 14 - pw, 'jump', input.jump);
-    if (R.got.includes('trick')) {                     // the trick pad, just above sprint: dark when a trick is possible
-      const ty = trickPadY(), ready = trickReady();
-      g.save(); g.setLineDash([7, 7]); g.lineWidth = 2.5; g.strokeStyle = ready || input.trick ? INK : '#b4b4b4';
-      rrect(g, SAFE.l + 14, ty, pw, ph, 16); g.fillStyle = input.trick ? '#ececec' : 'rgba(255,255,255,0.6)';   // see-through, so the roofs behind still show g.fill(); g.stroke(); g.restore();
-      g.fillStyle = ready || input.trick ? INK : '#b0b0b0'; g.font = `700 ${small ? 22 : 26}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText('trick', SAFE.l + 14 + pw / 2, ty + ph / 2 + 2);
-    }
+    const trickNow = R.got.includes('trick') && trickReady();   // in the air with room for a trick: sprint becomes trick
+    padAt(SAFE.l + 14, trickNow ? 'trick!' : 'sprint', input.sprint || trickNow); padAt(W - SAFE.r - 14 - pw, 'jump', input.jump);
   }
   g.restore();
 }
 
-const padH = () => Math.min(64, H * 0.12), padY = () => H - SAFE.b - padH() - 40, trickPadY = () => padY() - padH() - 14;
 
 // ---------- Overlay art ----------
 function mini(canvas, fn) {
@@ -1528,30 +1522,28 @@ function setDiff(k) {
   showBestLine();
 }
 document.querySelectorAll('#diffs .diff').forEach(b => b.onclick = () => setDiff(b.dataset.d));
-$('ctrlHint').textContent = touch ? 'Right side to jump, hold left side to sprint' : 'Space to jump, hold Shift to sprint, Down for tricks';
+$('ctrlHint').textContent = touch ? 'Right side to jump, hold left side to sprint' : 'Space to jump, hold Shift to sprint';
 
 // ---------- Input ----------
-const ptrs = new Map();   // pointerId -> 'jump' | 'sprint' | 'trick'
+const ptrs = new Map();   // pointerId -> 'jump' | 'sprint'
 function syncPtrs() {
   input.sprint = keyS.size > 0 || [...ptrs.values()].includes('sprint');
   input.jump = keyJ.size > 0 || [...ptrs.values()].includes('jump');
-  input.trick = keyT.size > 0 || [...ptrs.values()].includes('trick');
 }
-const keyJ = new Set(), keyS = new Set(), keyT = new Set();
-function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); keyT.clear(); input.jump = input.sprint = input.jumpPressed = input.trick = input.trickPressed = false; }
+const keyJ = new Set(), keyS = new Set();
+function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); input.jump = input.sprint = input.jumpPressed = input.trickPressed = false; }
+const sprintTap = () => { if (R && !R.ground) input.trickPressed = true; };   // sprint pressed in the air = a trick (if you have the card)
 cv.addEventListener('pointerdown', e => {
   if (state !== 'play') return;
-  // left side: the trick pad (once you have it) is the band just above the sprint pad; the rest sprints
-  const ty = trickPadY(), onTrick = R.got.includes('trick') && e.clientY >= ty - 26 && e.clientY < ty + padH() + 7;
-  const role = e.clientX >= W / 2 ? 'jump' : onTrick ? 'trick' : 'sprint';
-  ptrs.set(e.pointerId, role); if (role === 'jump') input.jumpPressed = true; if (role === 'trick') input.trickPressed = true;
+  const role = e.clientX < W / 2 ? 'sprint' : 'jump';
+  ptrs.set(e.pointerId, role); if (role === 'jump') input.jumpPressed = true; else sprintTap();
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
   syncPtrs(); e.preventDefault();
 });
 const endPtr = e => { ptrs.delete(e.pointerId); syncPtrs(); };
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('contextmenu', e => e.preventDefault());
-const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'], SPRINT_KEYS = ['ShiftLeft', 'ShiftRight', 'ArrowRight', 'KeyD'], TRICK_KEYS = ['ArrowDown', 'KeyS', 'KeyE'];
+const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'], SPRINT_KEYS = ['ShiftLeft', 'ShiftRight', 'ArrowRight', 'KeyD'];
 window.addEventListener('keydown', e => {
   if (state === 'pick') {                             // the card picker: 1, 2, 3 pick a card; Enter / Space takes the first
     const n = { Digit1:0, Digit2:1, Digit3:2, Numpad1:0, Numpad2:1, Numpad3:2, Enter:0, Space:0 }[e.code];
@@ -1564,11 +1556,10 @@ window.addEventListener('keydown', e => {
   }
   if (state !== 'play') return;
   if (JUMP_KEYS.includes(e.code)) { if (!e.repeat) input.jumpPressed = true; keyJ.add(e.code); e.preventDefault(); }
-  if (SPRINT_KEYS.includes(e.code)) { keyS.add(e.code); e.preventDefault(); }
-  if (TRICK_KEYS.includes(e.code)) { if (!e.repeat) input.trickPressed = true; keyT.add(e.code); e.preventDefault(); }
+  if (SPRINT_KEYS.includes(e.code)) { if (!e.repeat) sprintTap(); keyS.add(e.code); e.preventDefault(); }
   syncPtrs();
 });
-window.addEventListener('keyup', e => { keyJ.delete(e.code); keyS.delete(e.code); keyT.delete(e.code); syncPtrs(); });
+window.addEventListener('keyup', e => { keyJ.delete(e.code); keyS.delete(e.code); syncPtrs(); });
 window.addEventListener('blur', clearInput);
 
 // ---------- Loop ----------
