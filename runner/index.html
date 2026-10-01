@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Runner Game v4.1</title>
+<title>Doodle Runner Game v5.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -177,10 +177,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v4.1</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v5.0</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Runner Game</h1><div class="ver">v4.1</div>
+  <h1>Doodle Runner Game</h1><div class="ver">v5.0</div>
   <canvas id="startArt" width="400" height="220"></canvas>
   <p>Run, run, run across the rooftops!<br>Leap the gaps and hop the AC units.<br>How far can you go?</p>
   <div class="diffs" id="diffs">
@@ -217,15 +217,19 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <h3>Watch out!</h3>
   <p>Fall down a gap between buildings and it's game over. Bump into a wall or a rooftop thing and you'll stop, so jump it quickly before the screen squishes you against the edge!</p>
   <h3>Skill Cards</h3>
-  <p>Run far enough and you'll find a <b>Skill Card</b>! Pick it up for a new move and a little bit of gear. Some cards can be upgraded later on.</p>
+  <p>Run far enough and you'll find a <b>Skill Card</b>! There's a new one at <b>250, 600, 1000, 1500, 2100 and 2800 m</b>, each with a new move and a little bit of gear. Once you have a move, bigger gaps and walls start to turn up!</p>
   <h3>Tricks</h3>
   <p>With the <b>Trick</b> card (and its backwards cap!), press <b>sprint</b> again <b>in the air</b> to flip, spin or cartwheel. You need lots of air: a <b>sprint jump</b>, or a jump down onto a lower roof. Land it for bonus points! Leave it too late and you'll tumble, and it takes a second to get back up.</p>
+  <h3>Double Jump</h3>
+  <p>With the <b>Double Jump</b> card (winged sneakers!), tap <b>jump</b> again in the air to jump once more. <b>Hermes Wings</b> give you a third jump!</p>
+  <h3>Floaty Cape</h3>
+  <p>With the <b>Floaty Cape</b>, <b>hold jump</b> while you're coming down to float gently over big gaps. Each jump gets about a second and a half of floating (more with the <b>Super Cape</b>).</p>
   <h3>Score</h3>
   <p>Every metre you run scores a point, and landed tricks score lots more. The screen slowly gets faster the further you go. Beat the <b>top 3</b> (or your own best) and pop in your 3 letters for the leaderboard!</p>
   <h3>Controls</h3>
   <div class="ctrls">
-    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint. Once you have tricks, touch the <b>left side</b> again in the air to do one.</p></div>
-    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. Once you have tricks, press sprint again <b>in the air</b> to do one. <b>Enter</b> presses the big button.</p></div>
+    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint. Once you have tricks, touch the <b>left side</b> again in the air to do one. Tap the <b>right side</b> in the air to double jump, and hold it to float.</p></div>
+    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. Once you have tricks, press sprint again <b>in the air</b> to do one. Tap jump in the air to double jump, and hold it to float. <b>Enter</b> presses the big button.</p></div>
   </div>
   <p>The <b>restart</b> button (top right) asks "sure?" first, so tap it twice.</p>
   <div class="center"><button class="btn" id="howClose">Got it!</button></div>
@@ -277,7 +281,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <script>
 (() => {
 'use strict';
-const VERSION = '4.1';
+const VERSION = '5.0';
 const TAU = Math.PI * 2, D = Math.PI / 180;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -738,25 +742,41 @@ function drawCape(g, B, gear, k = 1) {
 
 // ---- Skill Cards: which cards there are, when they turn up ----
 const CARD_AT = [250, 600, 1000, 1500, 2100, 2800];   // metres
-const CARDS = [
+const CARDS = [                                       // given in this order, one at each stop (Kev, 1 Oct 2026)
   { id:'trick', tag:'new', name:'Trick', desc:'Press sprint in the air to flip and spin! Needs a sprint jump or a drop. Land it for points!', demo:'trick' },
+  { id:'djump', tag:'new', name:'Double Jump', desc:'Winged sneakers! Tap jump again in the air to jump once more.', demo:'djump' },
   { id:'trick2', needs:'trick', tag:'upgrade', name:'Trick Pro', desc:'Doubles and corks! Bigger tricks for bigger points.', demo:'trick2' },
+  { id:'cape', tag:'new', name:'Floaty Cape', desc:'Hold jump while you come down to float slowly over big gaps!', demo:'cape' },
+  { id:'djump2', needs:'djump', tag:'upgrade', name:'Hermes Wings', desc:'Bigger wings: Triple Jump! Tap jump a third time in the air.', demo:'tjump' },
+  { id:'cape2', needs:'cape', tag:'upgrade', name:'Super Cape', desc:'A bigger cape with a little heart. Float slower, and for longer!', demo:'cape2' },
 ];
-const gearFor = got => ({ cap: got.includes('trick2') ? 2 : got.includes('trick') ? 1 : 0 });
+const gearFor = got => ({ cap: got.includes('trick2') ? 2 : got.includes('trick') ? 1 : 0,
+  wings: got.includes('djump2') ? 2 : got.includes('djump') ? 1 : 0, cape: got.includes('cape2') ? 2 : got.includes('cape') ? 1 : 0 });
+// extra jumps in the air, and the cape's glide
+const EXTRA_V = 560;                                  // each extra jump (up to ~78 higher)
+const extraJumps = got => got.includes('djump2') ? 2 : got.includes('djump') ? 1 : 0;
+const glideV = got => got.includes('cape2') ? 55 : 80;          // the slowest he falls while floating
+const glideMax = got => got.includes('cape2') ? 2.5 : 1.5;      // seconds of floating per jump
+// air time and height from flat ground for a jump plus n extra jumps, each at the top of the last
+function airFor(n) {
+  let t = JUMP_V / G, h = JUMP_V * JUMP_V / (2 * G);
+  for (let i = 0; i < n; i++) { t += EXTRA_V / G; h += EXTRA_V * EXTRA_V / (2 * G); }
+  return { t: t + Math.sqrt(2 * h / G), h };
+}
 
 // ---------- Game state ----------
 let state = 'start', time = 0, runT = 0;
-let R, cam, segs, genX, genH, lastSprintX = -1e9, toasts, puffs, pops, nextMilestone, deathT, deathCause;
+let R, cam, segs, genX, genH, lastSprintX = -1e9, toasts, puffs, pops, rings, nextMilestone, deathT, deathCause;
 let bestNow = 0, bestAtStart = 0;
 const input = { jump:false, sprint:false, jumpPressed:false, trickPressed:false };
 
 function resetGame() {
   cam = { x:-W / baseScale() * HOME, v:DIFF.v0, gy:0, z:1 };
-  segs = []; genX = -2000; genH = 0; lastSprintX = -1e9; toasts = []; puffs = []; pops = [];
+  segs = []; genX = -2000; genH = 0; lastSprintX = -1e9; toasts = []; puffs = []; pops = []; rings = [];
   addSeg(2000 + 900, 0);                   // a nice long flat start
   R = { x:0, y:0, vx:DIFF.v0, vy:0, ground:true, coyote:0, jumpBuf:0, cut:false, sprinting:false, stamina:STAMINA,
         apexY:0, mode:'run', p:0, ap:0, va:DIFF.v0, airT:0, spin:0, spinW:0, armNeed:0, airAmt:0, pT:null, pred:null, touch:null, roll:null, xf:null, lastRig:null,
-        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, trick:null, crash:null, trickPts:0, takeY:0, sJump:false };
+        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, trick:null, crash:null, trickPts:0, takeY:0, sJump:false, airHold:false, jumps:0, glideT:0, glideW:0, gliding:false, kickT:9 };
   runT = 0; nextMilestone = 100; deathT = 0; deathCause = '';
   bestNow = bestAtStart = loadBest(diffKey);
   gen();
@@ -773,7 +793,7 @@ function gen() {
 }
 function addChunk() {
   const v = Math.min(DIFF.vmax, cam.v + DIFF.ramp * Math.max(0, genX - R.x) / cam.v);   // screen speed when you get here
-  const prog = clamp(R.dist / 1500, 0, 1), rnd = Math.random;
+  const prog = clamp(R.dist / 1500, 0, 1), rnd = Math.random, ext = extraJumps(R.got), A1 = airFor(1), A2 = airFor(2);
   addSeg((160 + rnd() * 320) * (1 - 0.35 * prog) + v * 0.5, genH);            // room to land and line up
   const jumpT = 2 * JUMP_V / G, sprintT = 2 * SPRINT_JUMP_V / G;
   const gapMax = Math.min(0.85, 0.66 * DIFF.gap) * v * jumpT;                    // a normal jump clears this with room to spare
@@ -782,13 +802,16 @@ function addChunk() {
   const sWallMax = Math.min(0.8 * DIFF.wall, 0.82) * SPRINT_JUMP_V * SPRINT_JUMP_V / (2 * G);   // ~110
   const pick = [['hole', 2.6], ['wall', 1.2], ['drop', 1.5], ['holeDown', 1.1], ['holeUp', 0.8 * prog],
                 ['steps', 0.6], ['sprintHole', 1.4 * clamp((prog - 0.1) * 4, 0, 1)], ['sprintWall', 0.7 * clamp((prog - 0.2) * 4, 0, 1)],
-                ['object', 3], ['objects2', 0.8 * clamp(prog * 3, 0, 1)], ['sprintHut', 0.6 * clamp((prog - 0.2) * 4, 0, 1)]];
+                ['object', 3], ['objects2', 0.8 * clamp(prog * 3, 0, 1)], ['sprintHut', 0.6 * clamp((prog - 0.2) * 4, 0, 1)],
+                ['djHole', ext >= 1 ? 1.3 : 0], ['djWall', ext >= 1 ? 0.7 : 0], ['tjHole', ext >= 2 ? 1 : 0], ['tjWall', ext >= 2 ? 0.5 : 0],
+                ['glideHole', R.got.includes('cape') ? 1 : 0]];
   // sprint obstacles are spaced out so your sprint has time to fill back up
   if (genX - lastSprintX < v * (STAMINA / RECHARGE + 1.2)) { pick[6][1] = 0; pick[7][1] = 0; pick[10][1] = 0; }
   let sum = pick.reduce((a, b) => a + b[1], 0), r = rnd() * sum, kind = 'hole';
   for (const [k, w] of pick) { if ((r -= w) <= 0) { kind = k; break; } }
   const MAXH = 340;
-  if ((kind === 'wall' || kind === 'sprintWall' || kind === 'steps' || kind === 'holeUp') && genH > MAXH - 120) kind = 'drop';
+  if ((kind === 'wall' || kind === 'sprintWall' || kind === 'steps' || kind === 'holeUp' || kind === 'djWall') && genH > MAXH - 120) kind = 'drop';
+  if (kind === 'tjWall' && genH > MAXH - 180) kind = 'drop';
   if ((kind === 'drop' || kind === 'holeDown') && genH < 70) kind = 'wall';
   const between = (a, b) => a + rnd() * (b - a);
   if (kind === 'sprintHole' || kind === 'sprintWall' || kind === 'sprintHut') lastSprintX = genX;
@@ -809,6 +832,12 @@ function addChunk() {
   }
   else if (kind === 'objects2') { roofObject('ac', between(34, 50), between(50, 80)); addSeg(v * between(0.3, 0.45), genH); roofObject('ac', between(34, 50), between(50, 80)); }
   else if (kind === 'sprintHut') roofObject('bulk', between(wallMax * 1.1, sWallMax), between(110, 170));
+  else if (kind === 'djHole') addSeg(between(gapMax * 1.15, Math.max(gapMax * 1.2, 0.66 * v * A1.t)), null);       // needs a double jump (or a sprint jump)
+  else if (kind === 'djWall') { genH += between(sWallMax, 0.7 * A1.h); }                                        // up to ~122
+  else if (kind === 'tjHole') addSeg(between(0.62 * v * A1.t, 0.62 * v * A2.t), null);                         // needs a triple jump
+  else if (kind === 'tjWall') { genH += between(0.7 * A1.h, 0.68 * A2.h); }                                     // up to ~172
+  else if (kind === 'glideHole') addSeg(between(gapMax * 1.2, 0.6 * v * (JUMP_V / G + 1.1)), null);            // float across
+  if (kind === 'djHole' || kind === 'djWall' || kind === 'tjHole' || kind === 'tjWall' || kind === 'glideHole') addSeg(v * 0.5, genH);   // big moves land further on: extra room
   else if (kind === 'steps') { const n = 2 + Math.floor(rnd() * 2); for (let i = 0; i < n; i++) { genH += between(30, wallMax * 0.75); addSeg(between(110, 170) + v * 0.15, genH); } }
 }
 function segsIn(a, b, fn) { for (const s of segs) { if (s.x1 <= a) continue; if (s.x0 >= b) break; fn(s); } }
@@ -824,10 +853,12 @@ function lowestGroundInView() {
 }
 // where (and when) you'll land if you keep going: a quick look ahead along your jump
 function predictLanding() {
-  let x = R.x, y = R.y, vy = R.vy;
-  const dt = 1 / 120;
-  for (let t = dt; t < 2.5; t += dt) {
-    const py = y; vy -= G * dt; y += vy * dt; x += R.vx * dt;
+  let x = R.x, y = R.y, vy = R.vy, gt = R.glideT;
+  const dt = 1 / 120, canGlide = R.got.includes('cape') && input.jump && R.airHold, gv = glideV(R.got), gm = glideMax(R.got);
+  for (let t = dt; t < 4; t += dt) {
+    const py = y; vy -= G * dt;
+    if (canGlide && vy < 0 && gt < gm) { vy = Math.max(vy, -gv); gt += dt; }      // still holding jump: he'll float
+    y += vy * dt; x += R.vx * dt;
     if (vy <= 0) { const s = support(x, py + STEP); if (s !== null && y <= s) return { t: t - dt + dt * clamp((py - s) / (py - y), 0, 1), h:s }; }   // the exact moment
     if (y < lowestGroundInView() - 300) return null;
   }
@@ -846,7 +877,8 @@ function update(dt) {
   const rel = R.x - cam.x, home = vw * HOME;
 
   // sprint and pace
-  if (input.jumpPressed) { R.jumpBuf = 0.12; input.jumpPressed = false; }
+  if (input.jumpPressed) { R.jumpBuf = 0.12; input.jumpPressed = false; if (!R.ground && R.coyote <= 0) R.airHold = true; }
+  if (!input.jump) R.airHold = false;
   if (R.ground) {
     R.sprinting = input.sprint && R.stamina > 0.05 && !R.crash;
     if (R.crash) {                              // tumbled: he's slowed right down while he gets back up, so the screen catches up
@@ -862,10 +894,16 @@ function update(dt) {
   R.jumpBuf -= dt; R.coyote -= dt;
   if (R.jumpBuf > 0 && (R.ground || R.coyote > 0) && !R.crash) {      // you can jump out of a landing or a roll too
     const fast = R.sprinting || R.sprintT < 0.25 || R.vx > cam.v + 80;   // a sprint jump, even a split second after letting go
-    R.vy = fast ? SPRINT_JUMP_V : JUMP_V; R.ground = false; R.coyote = 0; R.jumpBuf = 0; R.cut = false;
+    R.vy = fast ? SPRINT_JUMP_V : JUMP_V; R.ground = false; R.coyote = 0; R.jumpBuf = 0; R.cut = false; R.airHold = false;
     if (R.mode !== 'air') enterAir();
     R.apexY = R.y; R.airT = 0; R.sJump = fast; R.takeY = R.y;
   }
+  // an extra jump in the air (Double Jump / Hermes Wings). A press just before landing is kept for a jump off the ground.
+  if (R.jumpBuf > 0 && !R.ground && R.coyote <= 0 && !R.crash && R.jumps < extraJumps(R.got) && !(R.pred && R.pred.t < 0.1)) {
+    R.jumpBuf = 0; R.jumps++; R.vy = EXTRA_V; R.cut = !!R.trick; R.kickT = 0; R.apexY = R.y; R.sJump = true;   // lots of air: tricks allowed
+    rings.push({ x: R.x, y: R.y, t: 0 });
+  }
+  R.kickT += dt;
   if (input.trickPressed) { input.trickPressed = false; tryTrick(); }
   if (!R.ground && !input.jump && R.vy > 0 && !R.cut) { R.vy *= JUMP_CUT; R.cut = true; }
   if (R.trick) R.trick.t += dt;
@@ -885,12 +923,18 @@ function update(dt) {
   }
   if (!R.ground) {
     const py = R.y;
-    R.vy -= G * dt; R.y += R.vy * dt; R.airT += dt; R.apexY = Math.max(R.apexY, R.y);
+    R.vy -= G * dt;
+    // Floaty Cape: holding jump on the way down caps the fall, for a while each jump. It counts as a gentle landing.
+    R.gliding = R.got.includes('cape') && input.jump && R.airHold && R.vy < 0 && R.glideT < glideMax(R.got) && !R.crash;
+    if (R.gliding) { R.vy = Math.max(R.vy, -glideV(R.got)); R.glideT += dt; R.apexY = Math.min(R.apexY, R.y + 40); }
+    R.y += R.vy * dt; R.airT += dt; R.apexY = Math.max(R.apexY, R.y);
     if (R.vy <= 0) {
       const sp = support(R.x, py + STEP);      // coming down just short of a ledge? step up onto it, like running does
       if (sp !== null && R.y <= sp) { R.y = sp; R.ground = true; R.lastGround = sp; land(R.apexY - sp); }
     }
   }
+  R.glideW += ((R.gliding && !R.ground ? 1 : 0) - R.glideW) * Math.min(1, dt * 7);
+  rings.forEach(r => r.t += dt); rings = rings.filter(r => r.t < 0.35);
   // animation clocks: the stride follows a smoothed running speed, so speeding up and sprinting blend in
   R.va += (R.vx - R.va) * Math.min(1, dt * 5);
   if (R.ground) R.p += cycleShape(R.va).f * dt * (R.touch && R.touch.big ? 1 - 0.6 * bump(R.touch.t, TOUCH_TAU) : 1);
@@ -904,7 +948,9 @@ function update(dt) {
   const base = groundLine(), floorY = (touch ? H - SAFE.b - Math.min(64, H * 0.12) - 40 : H - SAFE.b - 40) - 14, topY = SAFE.t + 50;
   const feet = R.ground ? R.y : Math.max(R.y, R.lastGround);
   let low = Infinity; segsIn(R.x - 40, cam.x + W / scale() + cam.v * 0.9, sg => { if (sg.h !== null) low = Math.min(low, sg.h); });   // about a second beyond the edge, so it's ready before it scrolls in
-  const zWant = low < Infinity ? clamp((floorY - topY) / ((feet + 105 - Math.min(low, feet)) * baseScale()), 0.5, 1) : 1;
+  let zWant = low < Infinity ? clamp((floorY - topY) / ((feet + 105 - Math.min(low, feet)) * baseScale()), 0.5, 1) : 1;
+  let gapEnd = 0; segsIn(R.x, R.x + cam.v * 0.8, sg => { if (sg.h === null && sg.x1 - sg.x0 > 190) gapEnd = Math.max(gapEnd, sg.x1 + 90 - R.x); });   // big gaps only
+  if (gapEnd > 0) zWant = Math.min(zWant, clamp(W * 0.6 / (baseScale() * gapEnd), 0.55, 1));
   const zOld = cam.z; cam.z += (zWant - cam.z) * Math.min(1, dt * 2.5);
   cam.x = R.x - (R.x - cam.x) * zOld / cam.z;                         // zoom around the runner, so he stays put on screen
   const sc = scale();
@@ -924,7 +970,7 @@ function update(dt) {
   pops.forEach(p => p.t += dt); pops = pops.filter(p => p.t < 1.5);
   // a Skill Card, once he's running steadily on a roof
   if (state === 'play' && R.cardI < CARD_AT.length && R.dist >= CARD_AT[R.cardI] && R.ground && !R.crash && !R.roll && !R.touch) {
-    const at = CARD_AT[R.cardI++], open = CARDS.filter(c => !R.got.includes(c.id) && (!c.needs || R.got.includes(c.needs)));
+    const at = CARD_AT[R.cardI++], next = CARDS.find(c => !R.got.includes(c.id) && (!c.needs || R.got.includes(c.needs))), open = next ? [next] : [];
     if (open.length) offerCards(open, at);
   }
 }
@@ -945,13 +991,13 @@ function trickReady() {                                // for the trick pad: cou
 }
 function pop(text, small) { pops.push({ text, t:0, x:R.x, y:R.y, small }); }
 function enterAir() {
-  R.crash = null; R.sJump = false; R.takeY = R.y;
+  R.crash = null; R.sJump = false; R.takeY = R.y; R.jumps = 0; R.glideT = 0;
   R.mode = 'air'; R.airT = 0; R.pT = null; R.pred = null; R.airAmt = 0; R.ap = 0.3;
   R.spin = 0; R.spinW = 0; R.armNeed = 0;
   if (R.touch && R.lastRig) { R.xf = { rig: R.lastRig, t: 0 }; R.touch = null; }   // springing off out of a landing
 }
 function land(fall) {
-  R.mode = 'run'; R.pred = null; R.pT = null;
+  R.mode = 'run'; R.pred = null; R.pT = null; R.jumps = 0; R.glideT = 0; R.gliding = false;
   if (R.trick) {                                       // landed it, or came down too soon and tumbled
     const tr = R.trick.tr, done = R.trick.t / tr.dur; R.trick = null;
     if (done < 0.85) {
@@ -1049,6 +1095,7 @@ function figureFor(Rn) {
     // ...and they take turns, like swimming: the far arm moves to the opposite side of the circle from the near arm
     const ua0 = rig.arms[0][0];
     rig.arms = rig.arms.map(([u, f], i) => { const u2 = i ? lerp(u, ua0 + 180, straight) : u; return [u2, lerp(f + u2 - u, u2 + 14, straight)]; });
+    if (!dead && Rn.glideW > 0.01) rig = lerpRig(rig, GLIDE_RIG(), Rn.glideW);   // floating: arms out, leaning into it like a flying squirrel
     if (!dead && pr && Rn.vy < 0 && pr.t < PRE_T) {     // get ready to land: feet together for a roll, or reach the landing foot forward
       let to = run;
       if (pr.fall >= FALL_LARGE) to = prepRig();
@@ -1197,7 +1244,13 @@ function render() {
   // runner
   const { B1, hipUp, face } = figureFor(R);
   const hx = SX(R.x), hy = SY(R.y + hipUp);
-  g.save(); g.translate(hx, hy); g.scale(s, s); drawRunner(g, B1, face); drawGear(g, B1, gearFor(R.got)); g.restore();
+  const gear = { ...gearFor(R.got), flap: Math.max(0, 1 - R.kickT / 0.2), glide: R.glideW, t: time, speed: R.va };
+  g.save(); g.lineWidth = Math.max(1.5, 2 * s);
+  rings.forEach(r => { const q = r.t / 0.35; g.globalAlpha = 1 - q; g.beginPath(); g.ellipse(SX(r.x), SY(r.y) + 4 * s, (14 + 30 * q) * s, (4 + 6 * q) * s, 0, 0, TAU);
+    g.moveTo(SX(r.x) - (20 + 22 * q) * s, SY(r.y) + 12 * s); g.lineTo(SX(r.x) - (30 + 30 * q) * s, SY(r.y) + 17 * s);
+    g.moveTo(SX(r.x) + (20 + 22 * q) * s, SY(r.y) + 12 * s); g.lineTo(SX(r.x) + (30 + 30 * q) * s, SY(r.y) + 17 * s); g.stroke(); });
+  g.restore();
+  g.save(); g.translate(hx, hy); g.scale(s, s); drawCape(g, B1, gear); drawRunner(g, B1, face); drawGear(g, B1, gear); g.restore();
   pops.forEach(p => {                                  // trick names float up from where he landed
     const a = Math.min(1, (1.5 - p.t) / 0.4, p.t / 0.08 + 0.3), x = clamp(SX(p.x) + 20, 90, W - 90);
     g.save(); g.globalAlpha = a; g.fillStyle = p.small ? '#777' : INK; g.textAlign = 'center'; g.textBaseline = 'middle';
@@ -1300,7 +1353,7 @@ function drawFit(cvs, muts = []) {
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.lineWidth = 3 * k; g.strokeStyle = INK; g.beginPath(); g.moveTo(Wc * 0.18, Hc * 0.9); g.lineTo(Wc * 0.82, Hc * 0.9); g.stroke();
   const P = runCycle(0.32, 420), B = bones(P), drop = lowest(B);
-  g.save(); g.translate(Wc / 2 - 4 * k, Hc * 0.9 - (drop + 8) * k); g.scale(k, k); drawRunner(g, B, 'happy', 1.15); drawGear(g, B, gearFor(muts), 1.15); g.restore();
+  g.save(); g.translate(Wc / 2 - 4 * k, Hc * 0.9 - (drop + 8) * k); g.scale(k, k); const gear = { ...gearFor(muts), t: 0.3, speed: 420 }; drawCape(g, B, gear, 1.15); drawRunner(g, B, 'happy', 1.15); drawGear(g, B, gear, 1.15); g.restore();
 }
 function drawQuestion(cvs) {
   const g = cvs.getContext('2d'), Wc = cvs.width, Hc = cvs.height;
@@ -1331,13 +1384,39 @@ function takeCard(c) {
 // the little demo on each card: he runs, jumps and does the card's trick
 function cardArt(c) {
   mini(c.cvs, g => {
-    const gy = 112, k = 0.68, cyc = 1.5, t = time % cyc, v = 300;
+    const gy = 112, k = 0.68, cyc = c.demo === 'tjump' ? 1.8 : 1.5, t = time % cyc, v = 300;
     g.lineWidth = 2.6; g.beginPath(); g.moveTo(20, gy); g.lineTo(140, gy); g.stroke();
-    const tr = c.demo === 'trick2' ? TRICKS_PRO[2] : TRICKS[0], air = tr.dur + 0.14, v0 = 1000 * air;
-    const h = t < air ? v0 * t - 1000 * t * t : 0;
-    const base = lerpRig(runRig(time * 2.6, v), airRig(time * 1.8, v), t < air ? 0.8 : 0, 'keep');
-    const fig = t > 0.05 && t < 0.05 + tr.dur ? trickFigure(base, tr, t - 0.05) : { B1: bones(rigToPose(base)), hipUp: base.H };
-    g.save(); g.translate(80, gy - (h * 0.28 + fig.hipUp) * k); g.scale(k, k); drawRunner(g, fig.B1); drawGear(g, fig.B1, gearFor(c.id === 'trick2' ? ['trick', 'trick2'] : [c.id])); g.restore();
+    const gear = { ...gearFor(c.needs ? [c.needs, c.id] : [c.id]), t: time, speed: 300 };
+    let h = 0, fig;
+    if (c.demo === 'djump' || c.demo === 'tjump') {            // jump, then jump again at the top (and once more with Hermes Wings)
+      const kicks = c.demo === 'tjump' ? [0.31, 0.59] : [0.31], sq = c.demo === 'tjump' ? 0.19 : 0.28;
+      const hAt = tt => { let hh = 0, t0 = 0, vy0 = 620;
+        for (const kt of kicks) { if (tt < kt) break; hh += vy0 * (kt - t0) - 1000 * (kt - t0) ** 2; t0 = kt; vy0 = 560; }
+        return Math.max(0, hh + vy0 * (tt - t0) - 1000 * (tt - t0) ** 2); };
+      h = hAt(t); const lk = kicks.filter(kt => kt <= t).pop();
+      gear.flap = Math.max(...kicks.map(kt => Math.max(0, 1 - Math.abs(t - kt) / 0.18)));
+      if (lk !== undefined && t < lk + 0.35) {                   // a puff of air kicked out under each extra jump
+        const q = (t - lk) / 0.35, py = gy - hAt(lk) * sq * k + 2;
+        g.save(); g.globalAlpha = 1 - q; g.lineWidth = 2; g.beginPath(); g.ellipse(80, py, 10 + 18 * q, 3 + 4 * q, 0, 0, TAU);
+        g.moveTo(80 - 14 - 14 * q, py + 6); g.lineTo(80 - 22 - 20 * q, py + 10); g.moveTo(80 + 14 + 14 * q, py + 6); g.lineTo(80 + 22 + 20 * q, py + 10); g.stroke(); g.restore();
+      }
+      h *= sq / 0.28;
+      const base = h > 0 ? lerpRig(runRig(time * 2.6, v), airRig(time * 1.8, v), 0.8, 'keep') : runRig(time * 2.6, v);
+      fig = { B1: bones(rigToPose(base)), hipUp: base.H };
+    } else if (c.demo === 'cape' || c.demo === 'cape2') {      // jump, then open the cape and float down slowly
+      const up = 0.31, gv = c.demo === 'cape2' ? 55 : 80;
+      h = t < up ? 620 * t - 1000 * t * t : Math.max(0, (620 * up - 1000 * up * up) - gv * (t - up));
+      gear.glide = t > up && h > 0 ? ease((t - up) / 0.15) : 0;
+      const run = runRig(time * 2.6, v), air = lerpRig(run, airRig(time * 1.8, v), 0.8, 'keep');
+      const base = h > 0 ? lerpRig(air, GLIDE_RIG(), gear.glide) : run;
+      fig = { B1: bones(rigToPose(base)), hipUp: base.H };
+    } else {                                                    // a trick from a big jump
+      const tr = c.demo === 'trick2' ? TRICKS_PRO[2] : TRICKS[0], air = tr.dur + 0.14, v0 = 1000 * air;
+      h = t < air ? v0 * t - 1000 * t * t : 0;
+      const base = lerpRig(runRig(time * 2.6, v), airRig(time * 1.8, v), t < air ? 0.8 : 0, 'keep');
+      fig = t > 0.05 && t < 0.05 + tr.dur ? trickFigure(base, tr, t - 0.05) : { B1: bones(rigToPose(base)), hipUp: base.H };
+    }
+    g.save(); g.translate(80, gy - (h * 0.28 + fig.hipUp) * k); g.scale(k, k); drawCape(g, fig.B1, gear); drawRunner(g, fig.B1); drawGear(g, fig.B1, gear); g.restore();
   });
 }
 
@@ -1352,6 +1431,7 @@ function toMainMenu() {
 }
 function die(cause) {
   if (state !== 'play') return;
+  R.gliding = false; R.glideW = 0;
   state = 'dying'; deathCause = cause; deathT = 0; clearInput();
   R.touch = R.roll = R.xf = R.trick = R.crash = null;
   if (cause === 'squish') { R.mode = 'squish'; R.x = cam.x + HW * 0.45 + 2; puff(R.x, R.y + 40, 5); }
