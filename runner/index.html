@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Runner Game v2.0</title>
+<title>Doodle Runner Game v4.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -163,6 +163,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   .startbtns{flex-direction:row;justify-content:center;align-items:center;gap:12px}
 }
 /* Doodle Runner additions */
+.muts.few{display:flex;justify-content:center;gap:10px}
+.muts.few .mut{flex:0 1 230px}
+#cardOv .card.wide{max-width:560px}
+.cardnote{font-size:15px;color:#888;margin-top:6px}
 .card canvas#startArt{width:200px;height:110px}
 .how canvas#howArt{width:300px;height:110px}
 .card canvas#deadArt{width:160px;height:110px}
@@ -173,12 +177,12 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v2.0</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v4.0</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Runner Game</h1><div class="ver">v2.0</div>
+  <h1>Doodle Runner Game</h1><div class="ver">v4.0</div>
   <canvas id="startArt" width="400" height="220"></canvas>
-  <p>Run, run, run!<br>Hop over holes and bouncy-jump up walls.<br>How far can you go?</p>
+  <p>Run, run, run across the rooftops!<br>Leap the gaps and hop the AC units.<br>How far can you go?</p>
   <div class="diffs" id="diffs">
     <button class="diff" data-d="easy">Easy</button>
     <button class="diff" data-d="normal">Normal</button>
@@ -207,17 +211,21 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <h3>Your goal</h3>
   <p>Your little runner never stops running! Keep up with the screen and see how far you can go.</p>
   <h3>Jump</h3>
-  <p>Hop over holes and up onto walls. Hold jump a bit longer for a bigger jump, or just tap it for a little hop.</p>
+  <p>Leap the gaps between buildings, and hop over (or onto) rooftop things like AC units, chimneys and stairwell huts. Hold jump a bit longer for a bigger jump, or just tap it for a little hop.</p>
   <h3>Sprint</h3>
   <p>Sprint for a quick burst of speed. You zoom ahead of your spot, and jumps from a sprint go higher and further, perfect for big gaps and tall walls! Your sprint needs a little rest before it's ready again, then you jog back to your spot.</p>
   <h3>Watch out!</h3>
-  <p>Fall down a hole and it's game over. Bump into a wall and you'll stop, so jump over it quickly before the screen squishes you against the edge!</p>
+  <p>Fall down a gap between buildings and it's game over. Bump into a wall or a rooftop thing and you'll stop, so jump it quickly before the screen squishes you against the edge!</p>
+  <h3>Skill Cards</h3>
+  <p>Run far enough and you'll find a <b>Skill Card</b>! Pick it up for a new move and a little bit of gear. Some cards can be upgraded later on.</p>
+  <h3>Tricks</h3>
+  <p>With the <b>Trick</b> card (and its backwards cap!), press <b>trick</b> in the air to flip, spin or cartwheel. You need lots of air: a <b>sprint jump</b>, or a jump down onto a lower roof. Land it for bonus points! Leave it too late and you'll tumble, and it takes a second to get back up.</p>
   <h3>Score</h3>
-  <p>Every metre you run counts, and the screen slowly gets faster the further you go. Beat the <b>top 3</b> (or your own best) and pop in your 3 letters for the leaderboard!</p>
+  <p>Every metre you run scores a point, and landed tricks score lots more. The screen slowly gets faster the further you go. Beat the <b>top 3</b> (or your own best) and pop in your 3 letters for the leaderboard!</p>
   <h3>Controls</h3>
   <div class="ctrls">
-    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint.</p></div>
-    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. <b>Enter</b> presses the big button.</p></div>
+    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint. The <b>trick</b> pad sits just above sprint.</p></div>
+    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. <b>Down</b>, <b>S</b> or <b>E</b> for a trick. <b>Enter</b> presses the big button.</p></div>
   </div>
   <p>The <b>restart</b> button (top right) asks "sure?" first, so tap it twice.</p>
   <div class="center"><button class="btn" id="howClose">Got it!</button></div>
@@ -233,6 +241,12 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
     <button class="btn" id="againBtn">Try again</button>
     <button class="btn small" id="deadMenuBtn">Main menu</button>
   </div>
+</div></div>
+
+<div class="overlay hidden" id="cardOv"><div class="card wide">
+  <h2>New Skill Card!</h2><p id="cardMsg"></p>
+  <div class="muts" id="cardList"></div>
+  <div class="cardnote" id="cardNote"></div>
 </div></div>
 
 <div class="overlay hidden" id="boardOv"><div class="card board">
@@ -263,7 +277,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <script>
 (() => {
 'use strict';
-const VERSION = '2.0';
+const VERSION = '4.0';
 const TAU = Math.PI * 2, D = Math.PI / 180;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -526,13 +540,13 @@ function drawRunner(g, B, face = 'happy', k = 1) {
   const rot = Math.atan2(f[1], f[0]);
   g.fillStyle = INK;
   if (face === 'happy') {
-    [[7.2, 1.4, 2.6], [-0.6, 1.8, 2.4]].forEach(([fw, u, r]) => {
+    (B.front ? [[3.8, 1.6, 2.5], [-3.8, 1.6, 2.5]] : [[7.2, 1.4, 2.6], [-0.6, 1.8, 2.4]]).forEach(([fw, u, r]) => {
       const [x, y] = P(fw, u);
       g.beginPath(); g.ellipse(x, y, r * q, r * 1.25 * q, rot, 0, TAU); g.fillStyle = INK; g.fill();
       const [sx, sy] = P(fw - r * 0.3, u + r * 0.45);
       g.beginPath(); g.arc(sx, sy, r * 0.42 * q, 0, TAU); g.fillStyle = '#fff'; g.fill();
     });
-    const [mx, my] = P(3.4, -4.4);
+    const [mx, my] = P(B.front ? 0 : 3.4, -4.4);
     g.lineWidth = 1.8 * k; g.beginPath(); g.arc(mx, my, 1.9 * q, rot + 0.2, rot + Math.PI - 0.2); g.stroke();
   } else {
     g.lineWidth = 1.9 * k;
@@ -546,24 +560,210 @@ function drawRunner(g, B, face = 'happy', k = 1) {
   }
 }
 
+// ---------- Skill Cards: tricks, crash and gear (cap, winged sneakers) ----------
+// A trick spins the body while the jump carries on as normal. pitch = forward flips (+) / backward (-) in turns,
+// roll = side flips (turning about the running direction, seen from the side as the body flipping top-to-bottom),
+// twist = turns about the body's own long axis (seen as the body narrowing and turning to face the other way).
+const TRICKS = [
+  { name:'Front Flip',  shape:'tuck',    pitch: 1, roll:0, twist:0, dur:0.52, pts:50 },
+  { name:'Gainer',      shape:'tuck',    pitch:-1, roll:0, twist:0, dur:0.56, pts:60 },
+  { name:'Side Flip',   shape:'ftuck',   front:true, pitch:0, roll:0, twist:0, dur:0.58, pts:60 },   // turns to face you: a tucked cartwheel
+  { name:'Aerial',      shape:'star',    front:true, pitch:0, roll:0, twist:0, dur:0.6,  pts:70 },   // turns to face you: a no-hands cartwheel
+  { name:'Front Pike',  shape:'pike',    pitch: 1, roll:0, twist:0, dur:0.56, pts:80 },
+  { name:'Layout',      shape:'layout',  pitch:-1, roll:0, twist:0, dur:0.6,  pts:90 },
+  { name:'Full Twist',  shape:'layout',  pitch:-1, roll:0, twist:1, dur:0.64, pts:110 },
+  { name:'Cork',        shape:'tuck',    pitch:-1, roll:0, twist:1, dur:0.62, pts:120 },
+];
+const TRICKS_PRO = [                                   // Trick upgrade: doubles and bigger twists
+  { name:'Double Front', shape:'tuck',   pitch: 2, roll:0, twist:0, dur:0.72, pts:220 },
+  { name:'Double Gainer',shape:'tuck',   pitch:-2, roll:0, twist:0, dur:0.76, pts:240 },
+  { name:'Double Cork',  shape:'tuck',   pitch:-2, roll:0, twist:2, dur:0.8,  pts:320 },
+  { name:'Double Full',  shape:'layout', pitch:-1, roll:0, twist:2, dur:0.74, pts:260 },
+];
+// body shapes during a trick, as rigs (hip height, lean, nod, feet [ahead, above ground], arms [upper, fore])
+const TRICK_SHAPES = {
+  tuck:     () => ({ H: 30, lean: 70, nod: 20, feet: [[14, 16], [8, 14]],   arms: [[24, 96], [10, 84]] }),            // knees hugged to the chest
+  pike:     () => ({ H: 34, lean: 80, nod: 25, feet: [[36, 24], [32, 22]],  arms: [[70, 84], [60, 74]] }),            // legs straight out, reaching for the toes
+  layout:   () => ({ H: 46, lean: 0,  nod: 0,  feet: [[3, 0], [-3, 2]],     arms: [[105, 112], [-100, -94]] }),       // long and straight, arms out wide
+  straddle: () => ({ H: 42, lean: 4,  nod: 0,  feet: [[18, 6], [-16, 6]],   arms: [[120, 128], [-110, -102]] }),      // cartwheel shape, arms and legs wide
+};
+// front-on shapes (he's turned to face you), as poses: legs and arms to his right (+) and left (-) on screen
+const FRONT_SHAPES = {
+  stand: { lean: 0, nod: 0, legs: [[6, 0], [-6, 0]], arms: [[16, 22], [-16, -22]] },
+  star:  { lean: 0, nod: 0, legs: [[34, 34], [-34, -34]], arms: [[118, 122], [-118, -122]] },            // arms and legs spread wide
+  ftuck: { lean: 0, nod: 0, legs: [[132, 24], [-132, -24]], arms: [[70, 140], [-70, -140]] },            // knees up and apart, hands on shins
+};
+let lastTricks = [];
+function pickTrick(pro, room = 9) {                    // random, but never the same as one of the last two
+  // room: seconds left before landing. Only tricks that fit are picked (if none fit, he tries one anyway... and crashes)
+  const all = pro ? [...TRICKS, ...TRICKS_PRO, ...TRICKS_PRO] : TRICKS, fit = all.filter(t => t.dur * 0.92 <= room), pool = fit.length ? fit : TRICKS;
+  let t, n = 0; do { t = pool[Math.floor(Math.random() * pool.length)]; } while (lastTricks.includes(t.name) && ++n < 20);
+  lastTricks = [t.name, ...lastTricks].slice(0, 2); return t;
+}
+// The figure mid-trick. base = the rig he'd have without the trick; t = seconds into the trick.
+function trickFigure(base, tr, t) {
+  const k = clamp(t / tr.dur, 0, 1);
+  if (tr.front) return frontTrick(base, tr, k);
+  const shapeW = ease(k / 0.18) * (1 - ease((k - 0.8) / 0.2));
+  const rig = lerpRig(base, TRICK_SHAPES[tr.shape](), shapeW);
+  const spin = k < 0.5 ? 2 * k * k : 1 - 2 * (1 - k) * (1 - k);      // eases in and out, quickest in the middle
+  const B0 = bones(rigToPose(rig)), all = [B0.head, ...B0.legs.flat(), ...B0.arms.flat()];
+  const piv = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length];
+  let B = transform(B0, 0, piv, 0, 0, Math.cos(tr.twist * TAU * spin), 1);          // twist, about his own long axis
+  B = transform(B, tr.pitch * TAU * spin, piv, 0, 0);                               // flip, forwards or back
+  B = transform(B, 0, piv, 0, 0, 1, Math.cos(tr.roll * TAU * spin));                // side flip, about the running direction
+  B.hsx = B.hsy = 1;                                                                // his head is a ball: it stays round
+  return { B1: B, hipUp: rig.H, rig };
+}
+// Cartwheel-style tricks: turn to face you, spin flat on the screen like a wheel rolling forwards, turn back side-on
+function frontTrick(base, tr, k) {
+  const turnIn = clamp(k / 0.14, 0, 1), turnOut = clamp((1 - k) / 0.14, 0, 1), side = turnIn < 0.5 || turnOut < 0.5;
+  let B0, H = base.H;
+  if (side) B0 = bones(rigToPose(base));
+  else {
+    const w = ease((k - 0.12) / 0.16) * (1 - ease((k - 0.74) / 0.14));
+    B0 = bones(mix(FRONT_SHAPES.stand, FRONT_SHAPES[tr.shape], w)); H = lerp(base.H, 40, w);
+  }
+  const all = [B0.head, ...B0.legs.flat(), ...B0.arms.flat()];
+  const piv = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length];
+  const narrow = Math.abs(Math.cos(Math.PI * Math.min(turnIn, turnOut)));    // the turn: he narrows to edge-on, then opens out the other way
+  let B = transform(B0, 0, piv, 0, 0, Math.max(0.04, narrow), 1);
+  const sk = clamp((k - 0.14) / 0.72, 0, 1), spin = sk < 0.5 ? 2 * sk * sk : 1 - 2 * (1 - sk) * (1 - sk);
+  B = transform(B, TAU * spin, piv, 0, 0);
+  B.hsx = B.hsy = 1;
+  if (!side) {                                       // facing you: his face looks straight out
+    const ux = B.head[0] - B.sh[0], uy = B.head[1] - B.sh[1], ul = Math.hypot(ux, uy) || 1;
+    B.fwd = [-uy / ul, ux / ul]; B.front = true;
+  }
+  return { B1: B, hipUp: H };
+}
+// Crash: lands in a heap, lies there a moment, then gets back up and runs on. t = seconds since landing.
+const CRASH_T = 1.0;
+const SPRAWL = () => ({ H: 20, lean: 20, nod: 0, feet: [[24, 14], [8, 4]], arms: [[60, 100], [140, 150]] });
+function crashFigure(run, t, landAng) {
+  const k = clamp(t / CRASH_T, 0, 1), down = k < 0.55, up = ease((k - 0.55) / 0.45);
+  const rig = down ? lerpRig(SPRAWL(), prepRig(), ease((k - 0.25) / 0.3)) : lerpRig(prepRig(), run, up);
+  const ang = lerp(landAng, -TAU / 4, ease(k / 0.12)) * (1 - ease((k - 0.3) / 0.35));   // thud onto his back, then roll up
+  const B0 = bones(rigToPose(rig)), all = [B0.head, ...B0.legs.flat(), ...B0.arms.flat()];
+  const piv = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length];
+  const B1 = transform(B0, ang, piv, 0, 0);
+  return { B1, hipUp: lerp(softLowest(B1), rig.H, up), face: k < 0.6 ? 'dizzy' : 'happy' };
+}
+// ---- gear drawn on the runner by Skill Cards ----
+// gear: { cap: 0 | 1 | 2 (Trick, Trick upgrade), wings: 0 | 1 | 2 (Double Jump, upgrade), flap: 0..1 }
+function drawGear(g, B, gear, k = 1) {
+  if (!gear) return;
+  g.save(); g.strokeStyle = INK; g.lineCap = 'round'; g.lineJoin = 'round';
+  if (gear.wings) B.legs.forEach((leg, i) => drawSneaker(g, leg[1], leg[2], gear, i ? 0.85 : 1, k, B.front ? (i ? -1 : 1) : 0));
+  if (gear.cap) drawCap(g, B, gear.cap, k);
+  g.restore();
+}
+function drawCap(g, B, lvl, k) {                       // a baseball cap worn backwards
+  if (B.front) { drawCapFront(g, B, lvl, k); return; }
+  const r = L.head, f = B.fwd, fl = Math.hypot(f[0], f[1]) || 1, fx = f[0] / fl, fy = f[1] / fl, ux = fy, uy = -fx;
+  const P = (a, b) => [B.head[0] + fx * a + ux * b, B.head[1] + fy * a + uy * b];
+  g.beginPath();
+  for (let i = 0; i <= 16; i++) { const th = (18 + 144 * i / 16) * D, [x, y] = P(Math.cos(th) * r * 1.07, Math.sin(th) * r * 1.07); i ? g.lineTo(x, y) : g.moveTo(x, y); }
+  g.closePath(); g.fillStyle = '#fff'; g.fill(); g.lineWidth = 3.4 * k; g.stroke();
+  const [bx, by] = P(-r * 0.98, r * 0.36), [ex, ey] = P(-r * 1.75, r * 0.2);       // the peak, pointing backwards
+  g.lineWidth = 4.4 * k; g.beginPath(); g.moveTo(bx, by); g.lineTo(ex, ey); g.stroke();
+  const [tx, ty] = P(0, r * 1.07);
+  g.fillStyle = INK; g.beginPath(); g.arc(tx, ty, 1.8 * k, 0, TAU); g.fill();
+  if (lvl > 1) {                                        // Trick upgrade: a little star badge on the cap
+    const [sx, sy] = P(r * 0.2, r * 0.62); g.lineWidth = 1.6 * k; g.beginPath();
+    for (let i = 0; i <= 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? 1.8 : 4.2; i ? g.lineTo(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr) : g.moveTo(sx + Math.cos(a) * rr, sy + Math.sin(a) * rr); }
+    g.stroke();
+  }
+}
+function drawCapFront(g, B, lvl, k) {                  // facing you: just the cap's crown (the peak is round the back)
+  const r = L.head, f = B.fwd, ux = f[1], uy = -f[0], P = (a, b) => [B.head[0] + f[0] * a + ux * b, B.head[1] + f[1] * a + uy * b];
+  g.beginPath();
+  for (let i = 0; i <= 16; i++) { const th = (25 + 130 * i / 16) * D, [x, y] = P(Math.cos(th) * r * 1.07, Math.sin(th) * r * 1.07); i ? g.lineTo(x, y) : g.moveTo(x, y); }
+  g.closePath(); g.fillStyle = '#fff'; g.fill(); g.lineWidth = 3.4 * k; g.stroke();
+  const [tx, ty] = P(0, r * 1.07); g.fillStyle = INK; g.beginPath(); g.arc(tx, ty, 1.8 * k, 0, TAU); g.fill();
+}
+function drawSneaker(g, knee, foot, gear, sc, k, out = 0) {   // a little sneaker with Hermes wings at the heel (out: facing you, wings point outwards)
+  const dx = foot[0] - knee[0], dy = foot[1] - knee[1], dl = Math.hypot(dx, dy) || 1, d = [dx / dl, dy / dl];
+  const p = out ? [-d[1] * out, d[0] * out] : [d[1], -d[0]];
+  const Q = (a, b) => [foot[0] + p[0] * a - d[0] * b, foot[1] + p[1] * a - d[1] * b];   // a: forward along the foot, b: up the shin
+  const pts = [Q(-4, -1.5), Q(9, -1.5), Q(10.5, 1.5), Q(7, 4.5), Q(-3, 5.5)];
+  g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath();
+  g.fillStyle = '#fff'; g.fill(); g.lineWidth = 2.6 * k * sc; g.stroke();
+  g.lineWidth = 1.4 * k * sc; g.beginPath(); const [a1, b1] = Q(1, 1), [a2, b2] = Q(6, 3); g.moveTo(a1, b1); g.lineTo(a2, b2); g.stroke();   // a lace
+  const big = gear.wings > 1 ? 1.9 : 1, fl = 1 + 0.4 * (gear.flap || 0);           // Hermes Wings: nearly twice the size
+  const [wx, wy] = Q(-3.5, 4.5);
+  g.lineWidth = 1.8 * k * sc; g.beginPath();
+  [[-0.9, 0.9, 11], [-1, 0.45, 9], [-1, 0.05, 7], ...(gear.wings > 1 ? [[-0.55, 1.1, 9]] : [])].forEach(([fa, fb, len]) => {   // little feathers sweeping back (one more with Hermes Wings)
+    const L2 = len * big * fl, tip = [wx + (p[0] * fa - d[0] * fb) * L2, wy + (p[1] * fa - d[1] * fb) * L2];
+    const mid = [wx + (p[0] * fa * 0.5 - d[0] * (fb * 0.5 + 0.35)) * L2, wy + (p[1] * fa * 0.5 - d[1] * (fb * 0.5 + 0.35)) * L2];
+    g.moveTo(wx, wy); g.quadraticCurveTo(mid[0], mid[1], tip[0], tip[1]);
+  });
+  g.stroke();
+}
+
+// ---- Floaty Cape ----
+// The glide pose: leaning forward like a flying squirrel, arms out, legs trailing
+const GLIDE_RIG = () => ({ H: 40, lean: 58, nod: 34, feet: [[-14, 14], [-24, 22]], arms: [[100, 106], [-70, -64]] });
+// gear.cape: 1 = Floaty Cape, 2 = Super Cape (longer, with a heart). gear.glide: 0..1 how spread out it is.
+// gear.t: time (for the flutter), gear.speed: running speed. Draw this BEFORE the runner, so it hangs behind him.
+function drawCape(g, B, gear, k = 1) {
+  if (!gear || !gear.cape) return;
+  const gl = clamp(gear.glide || 0, 0, 1), t = gear.t || 0, sp = clamp(((gear.speed || 250) - 150) / 450, 0, 1);
+  const f = B.fwd, fl = Math.hypot(f[0], f[1]) || 1, bx = -f[0] / fl, by = -f[1] / fl;          // "back", away from his face
+  const N = [B.sh[0] + bx * 3, B.sh[1] + by * 3 + 2];                                             // tied at the back of the neck
+  const big = gear.cape > 1 ? 1.2 : 1, len = (40 + 12 * gl) * big;
+  const th = lerp(lerp(28, 62, sp), 96, gl) * D;                                                  // hangs down jogging, streams back at speed, spreads flat gliding
+  const dir = [bx * Math.sin(th), by * Math.sin(th) + Math.cos(th)], dl = Math.hypot(dir[0], dir[1]) || 1;   // between straight down and straight back
+  const dx = dir[0] / dl, dy = dir[1] / dl, nx = -dy, ny = dx;
+  const pts = (side) => { const out = [];
+    for (let i = 0; i <= 10; i++) { const u = i / 10, wv = Math.sin(TAU * (u * 1.2 - t * (2 + 3 * sp))) * (2 + 4 * sp) * u * (1 - 0.6 * gl);
+      const hw = (2.5 + (7 + 9 * gl) * u) * big, billow = gl * Math.sin(Math.PI * u) * 8;          // gliding, it fills with air like a sail
+      out.push([N[0] + dx * len * u + nx * (wv + side * hw + billow), N[1] + dy * len * u + ny * (wv + side * hw + billow)]); }
+    return out; };
+  const a = pts(1), b = pts(-1).reverse();
+  g.save(); g.lineJoin = 'round'; g.lineCap = 'round';
+  g.beginPath(); [...a, ...b].forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath();
+  g.fillStyle = '#fff'; g.fill(); g.strokeStyle = INK; g.lineWidth = 2.8 * k; g.stroke();
+  g.lineWidth = 1.3 * k; g.beginPath();                                                           // a couple of soft folds
+  for (const fo of [0.3, -0.3]) { for (let i = 3; i <= 9; i++) { const u = i / 10, p0 = a[i], p1 = b[10 - i]; const x = lerp(p0[0], p1[0], 0.5 + fo), y = lerp(p0[1], p1[1], 0.5 + fo); i === 3 ? g.moveTo(x, y) : g.lineTo(x, y); } }
+  g.stroke();
+  if (gear.cape > 1) {                                                                            // Super Cape: a little heart
+    const i = 7, c = [(a[i][0] + b[10 - i][0]) / 2, (a[i][1] + b[10 - i][1]) / 2], r = 3.6;
+    g.lineWidth = 1.6 * k; g.beginPath(); g.moveTo(c[0], c[1] + r);
+    g.bezierCurveTo(c[0] - r * 1.6, c[1] - r * 0.2, c[0] - r * 0.6, c[1] - r * 1.4, c[0], c[1] - r * 0.4);
+    g.bezierCurveTo(c[0] + r * 0.6, c[1] - r * 1.4, c[0] + r * 1.6, c[1] - r * 0.2, c[0], c[1] + r); g.stroke();
+  }
+  g.restore();
+}
+
+// ---- Skill Cards: which cards there are, when they turn up ----
+const CARD_AT = [250, 600, 1000, 1500, 2100, 2800];   // metres
+const CARDS = [
+  { id:'trick', tag:'new', name:'Trick', desc:'A trick button! Flip and spin in the air. Needs a sprint jump or a drop. Land it for points!', demo:'trick' },
+  { id:'trick2', needs:'trick', tag:'upgrade', name:'Trick Pro', desc:'Doubles and corks! Bigger tricks for bigger points.', demo:'trick2' },
+];
+const gearFor = got => ({ cap: got.includes('trick2') ? 2 : got.includes('trick') ? 1 : 0 });
+
 // ---------- Game state ----------
 let state = 'start', time = 0, runT = 0;
-let R, cam, segs, genX, genH, lastSprintX = -1e9, toasts, puffs, nextMilestone, deathT, deathCause;
+let R, cam, segs, genX, genH, lastSprintX = -1e9, toasts, puffs, pops, nextMilestone, deathT, deathCause;
 let bestNow = 0, bestAtStart = 0;
-const input = { jump:false, sprint:false, jumpPressed:false };
+const input = { jump:false, sprint:false, jumpPressed:false, trick:false, trickPressed:false };
 
 function resetGame() {
   cam = { x:-W / baseScale() * HOME, v:DIFF.v0, gy:0, z:1 };
-  segs = []; genX = -2000; genH = 0; lastSprintX = -1e9; toasts = []; puffs = [];
+  segs = []; genX = -2000; genH = 0; lastSprintX = -1e9; toasts = []; puffs = []; pops = [];
   addSeg(2000 + 900, 0);                   // a nice long flat start
   R = { x:0, y:0, vx:DIFF.v0, vy:0, ground:true, coyote:0, jumpBuf:0, cut:false, sprinting:false, stamina:STAMINA,
         apexY:0, mode:'run', p:0, ap:0, va:DIFF.v0, airT:0, spin:0, spinW:0, armNeed:0, airAmt:0, pT:null, pred:null, touch:null, roll:null, xf:null, lastRig:null,
-        lastGround:0, score:0, newBest:false, dist:0 };
+        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, trick:null, crash:null, trickPts:0, takeY:0, sJump:false, nagT:-9 };
   runT = 0; nextMilestone = 100; deathT = 0; deathCause = '';
   bestNow = bestAtStart = loadBest(diffKey);
   gen();
 }
-function addSeg(len, h) { segs.push({ x0:genX, x1:genX + len, h }); genX += len; if (h !== null) genH = h; }
+function addSeg(len, h, obj) { segs.push({ x0:genX, x1:genX + len, h, obj }); genX += len; if (h !== null && !obj) genH = h; }
+// a rooftop object sitting on the roof: you jump over it or onto it (type: ac, wall, chimney, skylight, bulk)
+function roofObject(type, h, w) { addSeg(w, genH + h, { type, base: genH }); }
 
 // ---------- Level: built a little ahead of the screen, always jumpable ----------
 function gen() {
@@ -580,17 +780,18 @@ function addChunk() {
   const sGapMax = 0.74 * (v + SPRINT_ADD) * sprintT;                             // a sprint jump clears this
   const wallMax = 0.75 * DIFF.wall * JUMP_V * JUMP_V / (2 * G);                  // ~72
   const sWallMax = Math.min(0.8 * DIFF.wall, 0.82) * SPRINT_JUMP_V * SPRINT_JUMP_V / (2 * G);   // ~110
-  const pick = [['hole', 3], ['wall', 2.4], ['drop', 1.6], ['holeDown', 1.2], ['holeUp', 0.8 * prog],
-                ['steps', 0.8], ['sprintHole', 1.4 * clamp((prog - 0.1) * 4, 0, 1)], ['sprintWall', 1.1 * clamp((prog - 0.2) * 4, 0, 1)]];
+  const pick = [['hole', 2.6], ['wall', 1.2], ['drop', 1.5], ['holeDown', 1.1], ['holeUp', 0.8 * prog],
+                ['steps', 0.6], ['sprintHole', 1.4 * clamp((prog - 0.1) * 4, 0, 1)], ['sprintWall', 0.7 * clamp((prog - 0.2) * 4, 0, 1)],
+                ['object', 3], ['objects2', 0.8 * clamp(prog * 3, 0, 1)], ['sprintHut', 0.6 * clamp((prog - 0.2) * 4, 0, 1)]];
   // sprint obstacles are spaced out so your sprint has time to fill back up
-  if (genX - lastSprintX < v * (STAMINA / RECHARGE + 1.2)) { pick[6][1] = 0; pick[7][1] = 0; }
+  if (genX - lastSprintX < v * (STAMINA / RECHARGE + 1.2)) { pick[6][1] = 0; pick[7][1] = 0; pick[10][1] = 0; }
   let sum = pick.reduce((a, b) => a + b[1], 0), r = rnd() * sum, kind = 'hole';
   for (const [k, w] of pick) { if ((r -= w) <= 0) { kind = k; break; } }
   const MAXH = 340;
   if ((kind === 'wall' || kind === 'sprintWall' || kind === 'steps' || kind === 'holeUp') && genH > MAXH - 120) kind = 'drop';
   if ((kind === 'drop' || kind === 'holeDown') && genH < 70) kind = 'wall';
   const between = (a, b) => a + rnd() * (b - a);
-  if (kind === 'sprintHole' || kind === 'sprintWall') lastSprintX = genX;
+  if (kind === 'sprintHole' || kind === 'sprintWall' || kind === 'sprintHut') lastSprintX = genX;
   if (kind === 'hole') addSeg(between(55, Math.max(60, gapMax * (0.55 + 0.45 * prog))), null);
   else if (kind === 'sprintHole') addSeg(between(gapMax * 1.05, Math.max(gapMax * 1.1, sGapMax)), null);
   else if (kind === 'wall') { genH += between(30, wallMax * (0.6 + 0.4 * prog)); }
@@ -598,6 +799,16 @@ function addChunk() {
   else if (kind === 'drop') { genH -= Math.min(genH, between(70, 250)); }
   else if (kind === 'holeDown') { addSeg(between(55, gapMax * 0.9), null); const dh = Math.min(genH, between(60, 200)); genH -= dh; }
   else if (kind === 'holeUp') { addSeg(between(50, gapMax * 0.6), null); genH += between(10, wallMax * 0.45); }
+  else if (kind === 'object') {
+    const t = rnd();
+    if (t < 0.32) roofObject('ac', between(34, Math.min(56, wallMax)), between(50, 90));
+    else if (t < 0.52) roofObject('wall', between(30, Math.min(52, wallMax)), between(18, 26));
+    else if (t < 0.68) roofObject('skylight', between(22, 32), between(70, 120));
+    else if (t < 0.84) roofObject('chimney', between(50, wallMax * 0.95), between(26, 36));
+    else roofObject('bulk', between(Math.min(58, wallMax * 0.8), wallMax * 0.95), between(100, 150));
+  }
+  else if (kind === 'objects2') { roofObject('ac', between(34, 50), between(50, 80)); addSeg(v * between(0.3, 0.45), genH); roofObject('ac', between(34, 50), between(50, 80)); }
+  else if (kind === 'sprintHut') roofObject('bulk', between(wallMax * 1.1, sWallMax), between(110, 170));
   else if (kind === 'steps') { const n = 2 + Math.floor(rnd() * 2); for (let i = 0; i < n; i++) { genH += between(30, wallMax * 0.75); addSeg(between(110, 170) + v * 0.15, genH); } }
 }
 function segsIn(a, b, fn) { for (const s of segs) { if (s.x1 <= a) continue; if (s.x0 >= b) break; fn(s); } }
@@ -637,8 +848,10 @@ function update(dt) {
   // sprint and pace
   if (input.jumpPressed) { R.jumpBuf = 0.12; input.jumpPressed = false; }
   if (R.ground) {
-    R.sprinting = input.sprint && R.stamina > 0.05;
-    if (R.sprinting) {                          // zoom ahead (but never off the front of the screen)
+    R.sprinting = input.sprint && R.stamina > 0.05 && !R.crash;
+    if (R.crash) {                              // tumbled: he's slowed right down while he gets back up, so the screen catches up
+      const k = R.crash.t / CRASH_T; R.vx = cam.v * lerp(0.45, 1, ease((k - 0.6) / 0.4));
+    } else if (R.sprinting) {                          // zoom ahead (but never off the front of the screen)
       R.vx = cam.v + SPRINT_ADD * clamp((vw * 0.82 - rel) / 60, 0, 1); R.stamina = Math.max(0, R.stamina - dt); R.sprintT = 0;
     } else R.vx = cam.v + clamp((home - rel) * 1.6, -90, 150);   // drift back to your spot (or catch up)
   } else R.sprinting = false;
@@ -647,13 +860,15 @@ function update(dt) {
 
   // jump (a moment of grace after running off an edge, and presses just before landing still count)
   R.jumpBuf -= dt; R.coyote -= dt;
-  if (R.jumpBuf > 0 && (R.ground || R.coyote > 0)) {      // you can jump out of a landing or a roll too
+  if (R.jumpBuf > 0 && (R.ground || R.coyote > 0) && !R.crash) {      // you can jump out of a landing or a roll too
     const fast = R.sprinting || R.sprintT < 0.25 || R.vx > cam.v + 80;   // a sprint jump, even a split second after letting go
     R.vy = fast ? SPRINT_JUMP_V : JUMP_V; R.ground = false; R.coyote = 0; R.jumpBuf = 0; R.cut = false;
     if (R.mode !== 'air') enterAir();
-    R.apexY = R.y; R.airT = 0;
+    R.apexY = R.y; R.airT = 0; R.sJump = fast; R.takeY = R.y;
   }
   if (!R.ground && !input.jump && R.vy > 0 && !R.cut) { R.vy *= JUMP_CUT; R.cut = true; }
+  if (input.trickPressed) { input.trickPressed = false; tryTrick(); }
+  if (R.trick) R.trick.t += dt;
 
   // move sideways, stopping at walls
   let nx = R.x + R.vx * dt, blocked = false;
@@ -699,21 +914,52 @@ function update(dt) {
 
   // score: metres run
   R.dist = Math.max(R.dist, R.x / UNIT_M);
-  addScoreTo(Math.floor(R.dist));
+  addScoreTo(Math.floor(R.dist) + R.trickPts);
   if (R.dist >= nextMilestone) { toast(`${nextMilestone} m!` + (nextMilestone % 500 === 0 ? ' Amazing!' : '')); nextMilestone += 100; }
 
   // game over: squished against the left edge, or down a hole
   if (R.x - HW <= cam.x + 2) die('squish');
   else if (!R.ground && R.y < cam.gy - (H - groundLine()) / s - 110) die('hole');
   toasts.forEach(t => t.life -= dt); toasts = toasts.filter(t => t.life > 0);
+  pops.forEach(p => p.t += dt); pops = pops.filter(p => p.t < 1.5);
+  // a Skill Card, once he's running steadily on a roof
+  if (state === 'play' && R.cardI < CARD_AT.length && R.dist >= CARD_AT[R.cardI] && R.ground && !R.crash && !R.roll && !R.touch) {
+    const at = CARD_AT[R.cardI++], open = CARDS.filter(c => !R.got.includes(c.id) && (!c.needs || R.got.includes(c.needs)));
+    if (open.length) offerCards(open, at);
+  }
 }
+// ---- Tricks ----
+// Allowed from a sprint jump, or when the landing is at least 50 below where he took off. The trick is picked to fit
+// the time left in the air; too late and none fit, so he tries one anyway and tumbles.
+function tryTrick() {
+  if (!R.got.includes('trick') || R.ground || R.trick || R.crash || state !== 'play') return;
+  const pr = predictLanding(), drop = pr ? R.takeY - pr.h : 999;
+  if (!R.sJump && drop < 50) { if (time - R.nagT > 2.5) { R.nagT = time; pop('need more air!', true); } return; }
+  R.trick = { tr: pickTrick(R.got.includes('trick2'), pr ? pr.t : 9), t: 0 };
+  R.cut = true;                                        // committed: the jump keeps its full height
+}
+function trickReady() {                                // for the trick pad: could he trick right now?
+  if (R.ground || R.trick || R.crash) return false;
+  const pr = R.pred; return (R.sJump || !pr || R.takeY - pr.h >= 50) && (!pr || pr.t >= TRICKS[0].dur * 0.92);   // allowed, and there's still time for one
+}
+function pop(text, small) { pops.push({ text, t:0, x:R.x, y:R.y, small }); }
 function enterAir() {
+  R.crash = null; R.sJump = false; R.takeY = R.y;
   R.mode = 'air'; R.airT = 0; R.pT = null; R.pred = null; R.airAmt = 0; R.ap = 0.3;
   R.spin = 0; R.spinW = 0; R.armNeed = 0;
   if (R.touch && R.lastRig) { R.xf = { rig: R.lastRig, t: 0 }; R.touch = null; }   // springing off out of a landing
 }
 function land(fall) {
   R.mode = 'run'; R.pred = null; R.pT = null;
+  if (R.trick) {                                       // landed it, or came down too soon and tumbled
+    const tr = R.trick.tr, done = R.trick.t / tr.dur; R.trick = null;
+    if (done < 0.85) {
+      const k = clamp(done, 0, 1), spin = k < 0.5 ? 2 * k * k : 1 - 2 * (1 - k) * (1 - k);
+      R.crash = { t: 0, ang: ((tr.front ? 1 : tr.pitch) * TAU * spin) % TAU }; R.touch = R.roll = R.xf = null;
+      puff(R.x + 6, R.y, 6); pop('Ouch!'); return;
+    }
+    R.trickPts += tr.pts; pop(`${tr.name}! +${tr.pts}`);
+  }
   const leg = landingLeg(R.p);
   if (fall >= FALL_LARGE) { startRoll(); puff(R.x + 10, R.y, 6); return; }
   if (R.lastRig) R.xf = { rig: R.lastRig, t: 0 };
@@ -731,6 +977,7 @@ function tickOverlays(dt) {
   if (R.touch) { R.touch.t += dt; if (R.touch.t > 0.7) R.touch = null; }
   if (R.roll) { R.roll.t += dt; if (R.roll.t >= R.roll.T) R.roll = null; }
   if (R.xf) { R.xf.t += dt; if (R.xf.t > 0.12) R.xf = null; }
+  if (R.crash) { R.crash.t += dt; if (R.crash.t >= CRASH_T) R.crash = null; }
 }
 // In the air: look ahead to the landing. Time the stride so a foot comes down just as he reaches the ground,
 // and circle the arms forwards so they finish in the landing pose.
@@ -751,7 +998,7 @@ function updateAir(dt) {
   // (a tapped jump is cut short in its first moment) and there's time to finish it; once started it always finishes.
   const airTot = R.airT + (pr ? pr.t : 0.6), e = hardFor(R.va);
   R.armNeed = Math.max(clamp((airTot - 0.45) / 0.3, 0, 1) * (0.75 + 0.25 * e), clamp((fall - 90) / 120, 0, 1));
-  const circling = R.spin < -0.5 || (R.airT > 0.08 && R.armNeed > 0.35 && (!pr || pr.t > 0.25));
+  const circling = R.spin < -0.5 || (R.airT > 0.12 && R.armNeed > 0.35 && (!pr || pr.t > 0.25));
   R.spinW += ((circling ? 1 : 0) - R.spinW) * Math.min(1, dt * 8);     // the arms ease into the circle
   if (circling) {
     if (pr && pr.t > 0.01) {
@@ -790,6 +1037,7 @@ function figureFor(Rn) {
   }
   let face = 'happy', rig;
   const run = runRig(Rn.p, Rn.va);
+  if (Rn.crash && Rn.mode === 'run') { Rn.lastRig = run; return crashFigure(run, Rn.crash.t, Rn.crash.ang); }
   if (Rn.mode === 'air' || Rn.mode === 'dead-fall') {
     const dead = Rn.mode === 'dead-fall', pr = Rn.pred;
     rig = lerpRig(run, airRig(Rn.ap, Rn.va), dead ? 1 : ease(Rn.airT / 0.18) * Rn.airAmt, 'keep');
@@ -807,8 +1055,9 @@ function figureFor(Rn) {
       rig = lerpRig(rig, to, ease(1 - pr.t / PRE_T), 'keep');
     }
     if (dead) face = 'oops';
+    if (Rn.trick && !dead) { Rn.lastRig = rig; const F = trickFigure(rig, Rn.trick.tr, Rn.trick.t); return { B1: F.B1, hipUp: F.hipUp, face }; }
   } else rig = run;
-  if (Rn.xf) rig = lerpRig(Rn.xf.rig, rig, ease(Rn.xf.t / 0.12));
+  if (Rn.xf) rig = lerpRig(Rn.xf.rig, rig, ease(Rn.xf.t / 0.12), 'fwd');
   rig = applyTouch(rig, Rn);
   Rn.lastRig = rig;
   if (!Rn.roll) return { B1: bones(rigToPose(rig)), hipUp: rig.H, face };
@@ -830,36 +1079,115 @@ function render() {
   const SX = x => (x - cam.x) * s, SY = y => base - (y - cam.gy) * s;
   g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK;
   drawClouds(g, s, base);
-  // ground
-  const rng = mulberry(91);
-  const list = []; segsIn(cam.x - 20, cam.x + vw + 20, sg => list.push(sg));
-  const idx0 = segs.indexOf(list[0]);
-  list.forEach((sg, i) => {
-    if (sg.h === null || sg.x1 - sg.x0 < 0.5) return;
-    const prev = segs[idx0 + i - 1], next = segs[idx0 + i + 1];
-    const x0 = SX(sg.x0), x1 = SX(sg.x1), y = SY(sg.h), bottom = H + 10;
-    g.lineWidth = Math.max(2.5, 4 * s);
-    g.beginPath(); g.moveTo(x0, y);
-    for (let xx = sg.x0; xx < sg.x1; xx += 22) g.lineTo(SX(xx), y + Math.sin(xx * 0.05) * 0.8 * s);
-    g.lineTo(x1, y); g.stroke();
-    const side = (nb, x) => { const to = !nb || nb.h === null ? bottom : SY(nb.h); if (to > y + 1) { g.beginPath(); g.moveTo(x, y); g.lineTo(x + (nb && nb.h !== null ? 0 : (x === x0 ? -1.5 : 1.5)), to); g.stroke(); } };
-    side(prev, x0); side(next, x1);
-    // dirt dashes and little grass tufts
-    g.lineWidth = Math.max(1.5, 2.5 * s);
-    const cell = 46;
-    for (let cx = Math.ceil(Math.max(sg.x0, cam.x - 50) / cell) * cell; cx < Math.min(sg.x1, cam.x + vw + 50); cx += cell) {
-      for (let row = 0; row < 6; row++) {
-        const n = cx * 0.37 + row * 13.1, hx = cx + hash(n) * 26, len = 6 + hash(n + 3) * 10;
-        if (hx < sg.x0 + 6 || hx + len > sg.x1 - 6) continue;
-        const yy = y + (14 + row * 34 + hash(n + 7) * 20) * s;
-        if (yy > H + 5) break;
-        g.beginPath(); g.moveTo(SX(hx), yy); g.lineTo(SX(hx + len), yy); g.stroke();
+  // ---- New York rooftops, true to size (he's ~1.9 m tall, so a storey is about twice his height) ----
+  // Each run of roof at one height is a row of buildings; gaps are the alleys between them. Rooftop objects
+  // (AC units, low walls, chimneys, skylights, stairwell huts) are part of the platform: you jump over or onto them.
+  const list = []; segsIn(cam.x - 400, cam.x + vw + 400, sg => list.push(sg));
+  const lw = Math.max(2.5, 4 * s), thin = Math.max(1, 1.5 * s), bottom = H + 10;
+  const wob = (x, k) => (hash(x * 0.137 + k) - 0.5) * 1.6 * s;          // a little marker wobble, fixed to the world so it never flickers
+  const runs = [];
+  list.forEach(sg => {
+    if (sg.h === null) { runs.push(null); return; }
+    const bh = sg.obj ? sg.obj.base : sg.h, last = runs[runs.length - 1];
+    if (last && last.bh === bh) last.x1 = sg.x1; else runs.push({ x0: sg.x0, x1: sg.x1, bh });
+  });
+  const CW = 340;
+  const cutsFor = (x0, x1) => {                                         // building widths, fixed to the world
+    const c = [x0];
+    for (let k = Math.ceil((x0 - 85) / CW); k * CW - 85 < x1; k++) {
+      const p = k * CW + (hash(k * 1.7) - 0.5) * 170;
+      if (p - c[c.length - 1] >= 150 && x1 - p >= 150) c.push(p);
+    }
+    c.push(x1); return c;
+  };
+  runs.forEach((run, ri) => {
+    if (!run || run.x1 < cam.x - 60 || run.x0 > cam.x + vw + 60) return;
+    const y = SY(run.bh), cuts = cutsFor(run.x0, run.x1);
+    for (let b = 0; b < cuts.length - 1; b++) {
+      const a = cuts[b], e = cuts[b + 1];
+      if (e < cam.x - 60 || a > cam.x + vw + 60) continue;
+      const kind = hash(Math.round(a) * 0.31 + 7);
+      const colW = 84 + Math.floor(kind * 3) * 14, ww = 40 + (kind > 0.5 ? 6 : 0), wh = 66 + (kind > 0.5 ? 12 : 0);
+      const rowH = 165 + Math.floor(hash(Math.round(a) * 0.53) * 3) * 10;
+      const ncol = Math.max(1, Math.floor((e - a - 30) / colW)), pad = (e - a - ncol * colW) / 2;
+      g.save(); g.lineWidth = thin; g.beginPath();
+      for (let r = 0; ; r++) {
+        const wy = y + (48 + r * rowH) * s; if (wy > H + 5) break;
+        if (kind >= 0.35 && kind < 0.62 && r > 0) { const fy = wy - 30 * s; g.moveTo(SX(a), fy); g.lineTo(SX(e), fy); }   // a band between floors
+        for (let c = 0; c < ncol; c++) {
+          const wx = a + pad + c * colW + (colW - ww) / 2, key = wx * 0.29 + r * 5.3;
+          const ax = SX(wx), w = ww * s, hgt = wh * s;
+          g.moveTo(ax + wob(key, 1), wy + wob(key, 2)); g.lineTo(ax + w + wob(key, 3), wy + wob(key, 4));
+          g.lineTo(ax + w + wob(key, 5), wy + hgt + wob(key, 6)); g.lineTo(ax + wob(key, 7), wy + hgt + wob(key, 8)); g.closePath();
+          g.moveTo(ax - 4 * s, wy + hgt + 5 * s); g.lineTo(ax + w + 4 * s, wy + hgt + 5 * s);                // window sill
+          if (kind < 0.35) { g.moveTo(ax + w / 2, wy + 2 * s); g.lineTo(ax + w / 2, wy + hgt - 2 * s); g.moveTo(ax + 2 * s, wy + hgt * 0.45); g.lineTo(ax + w - 2 * s, wy + hgt * 0.45); }
+        }
       }
-      if (hash(cx * 0.91) < 0.35) {
-        const tx = SX(cx + 10);
-        if (cx + 4 > sg.x0 && cx + 18 < sg.x1) { g.beginPath(); g.moveTo(tx - 4 * s, y); g.lineTo(tx - 6 * s, y - 7 * s); g.moveTo(tx, y); g.lineTo(tx, y - 9 * s); g.moveTo(tx + 4 * s, y); g.lineTo(tx + 7 * s, y - 6 * s); g.stroke(); }
+      g.stroke();
+      if (kind >= 0.62 && ncol >= 3) {                                   // an iron fire escape zig-zagging down
+        const fx0 = a + pad + colW * 0.1, fx1 = fx0 + colW * 1.8;
+        g.beginPath();
+        for (let r = 0; ; r++) {
+          const py = y + (48 + r * rowH + wh + 12) * s; if (py - 40 * s > H + 5) break;
+          g.moveTo(SX(fx0), py); g.lineTo(SX(fx1), py);
+          g.moveTo(SX(fx0), py - 32 * s); g.lineTo(SX(fx1), py - 32 * s);
+          for (let k = 0; k <= 5; k++) { const px = SX(fx0 + (fx1 - fx0) * k / 5); g.moveTo(px, py); g.lineTo(px, py - 32 * s); }
+          const up = r % 2 ? fx0 + 10 : fx1 - 10, dn = r % 2 ? fx1 - 10 : fx0 + 10;
+          g.moveTo(SX(up), py); g.lineTo(SX(dn), py + rowH * s);
+        }
+        g.stroke();
+      }
+      if (b > 0) { g.beginPath(); g.moveTo(SX(a), y); g.lineTo(SX(a) + wob(a, 9), bottom); g.stroke(); }     // seam between buildings
+      g.restore();
+      // a water tower on some wide roofs: scenery in soft grey, high on its stilts so he runs underneath
+      const busy = list.some(q => q.obj && q.x1 > a - 40 && q.x0 < e + 40);
+      if (e - a >= 300 && kind > 0.5 && !busy) {
+        const tx = (a + e) / 2 + (hash(a + 1) - 0.5) * (e - a - 200), tw = 84, legs = 120, th = 110, bh = run.bh;
+        g.save(); g.strokeStyle = '#aaa'; g.lineWidth = Math.max(1.4, 2.2 * s); g.beginPath();
+        for (const lx of [tx - tw / 2 + 6, tx + tw / 2 - 6]) { g.moveTo(SX(lx), y); g.lineTo(SX(lx), SY(bh + legs)); }
+        for (const yy of [bh + 30, bh + 75]) { g.moveTo(SX(tx - tw / 2 + 6), SY(yy)); g.lineTo(SX(tx + tw / 2 - 6), SY(yy + 40)); g.moveTo(SX(tx + tw / 2 - 6), SY(yy)); g.lineTo(SX(tx - tw / 2 + 6), SY(yy + 40)); }
+        g.moveTo(SX(tx - tw / 2 - 4), SY(bh + legs)); g.lineTo(SX(tx + tw / 2 + 4), SY(bh + legs));
+        g.rect(SX(tx - tw / 2), SY(bh + legs + th), tw * s, th * s);
+        for (const k of [0.33, 0.66]) { g.moveTo(SX(tx - tw / 2), SY(bh + legs + th * k)); g.lineTo(SX(tx + tw / 2), SY(bh + legs + th * k)); }
+        g.moveTo(SX(tx - tw / 2 - 5), SY(bh + legs + th)); g.lineTo(SX(tx), SY(bh + legs + th + 30)); g.lineTo(SX(tx + tw / 2 + 5), SY(bh + legs + th));
+        g.stroke(); g.restore();
       }
     }
+    // the roof edge he runs on, with a parapet ledge just below it
+    g.lineWidth = lw; g.beginPath(); g.moveTo(SX(run.x0), y);
+    for (let xx = run.x0 + 22; xx < run.x1; xx += 22) g.lineTo(SX(xx), y + Math.sin(xx * 0.05) * 0.6 * s);
+    g.lineTo(SX(run.x1), y); g.stroke();
+    g.save(); g.lineWidth = thin; g.beginPath(); g.moveTo(SX(run.x0), y + 7 * s); g.lineTo(SX(run.x1), y + 7 * s); g.stroke(); g.restore();
+    // building walls: down into the alley at a gap, or down to a lower roof next door
+    const wall = (nb, x) => { const to = nb === null ? bottom : nb === undefined ? null : SY(nb.bh); if (to !== null && to > y + 1) { g.lineWidth = lw; g.beginPath(); g.moveTo(x, y); g.lineTo(x, to); g.stroke(); } };
+    wall(runs[ri - 1], SX(run.x0)); wall(runs[ri + 1], SX(run.x1));
+  });
+  // rooftop objects: solid, so they're drawn bold like the roofs
+  list.forEach(sg => {
+    if (!sg.obj || sg.x1 < cam.x - 60 || sg.x0 > cam.x + vw + 60) return;
+    const X0 = SX(sg.x0), X1 = SX(sg.x1), yt = SY(sg.h), yb = SY(sg.obj.base), w = X1 - X0, hh = yb - yt, t = sg.obj.type;
+    g.save(); g.fillStyle = '#fff'; g.fillRect(X0, yt, w, hh);
+    g.lineWidth = thin; g.beginPath();
+    if (t === 'ac') {                                                   // air-con unit: slats and a fan
+      const r = Math.min(w * 0.28, hh * 0.36), cx = X1 - r - 6 * s, cy = (yt + yb) / 2;
+      g.moveTo(cx + r, cy); g.arc(cx, cy, r, 0, TAU);
+      for (let k = 0; k < 3; k++) { const an = k * TAU / 3 + 0.4; g.moveTo(cx, cy); g.lineTo(cx + Math.cos(an) * r * 0.8, cy + Math.sin(an) * r * 0.8); }
+      for (let x = X0 + 6 * s; x < cx - r - 5 * s; x += 6 * s) { g.moveTo(x, yt + 7 * s); g.lineTo(x, yb - 7 * s); }
+    } else if (t === 'wall' || t === 'chimney') {                       // brickwork
+      const bhgt = 9 * s, bw = 15 * s;
+      for (let yy = yt + bhgt, row = 0; yy < yb - 1; yy += bhgt, row++) { g.moveTo(X0, yy); g.lineTo(X1, yy);
+        for (let x = X0 + (row % 2 ? bw / 2 : bw); x < X1 - 2; x += bw) { g.moveTo(x, yy); g.lineTo(x, yy + bhgt); } }
+      if (t === 'chimney') { g.moveTo(X0 - 4 * s, yt + 6 * s); g.lineTo(X1 + 4 * s, yt + 6 * s); g.lineTo(X1 + 4 * s, yt); g.moveTo(X0 - 4 * s, yt + 6 * s); g.lineTo(X0 - 4 * s, yt); }
+    } else if (t === 'skylight') {                                      // glass skylight
+      g.rect(X0 + 5 * s, yt + 5 * s, w - 10 * s, hh - 9 * s);
+      for (let k = 0; k < 2; k++) { const x = X0 + w * (0.3 + 0.18 * k); g.moveTo(x, yb - 7 * s); g.lineTo(x + hh * 0.4, yt + 7 * s); }
+    } else if (t === 'bulk') {                                          // stairwell hut with a door
+      const dw = 34 * s, dh = Math.min(82 * s, hh - 14 * s), dx = X0 + Math.min(24 * s, w * 0.2);
+      g.rect(dx, yb - dh, dw, dh); g.moveTo(dx + dw - 6 * s + 2, yb - dh / 2); g.arc(dx + dw - 6 * s, yb - dh / 2, 2 * s, 0, TAU);
+      g.moveTo(X0 - 5 * s, yt + 7 * s); g.lineTo(X1 + 5 * s, yt + 7 * s);
+    }
+    g.stroke(); g.restore();
+    g.lineWidth = lw; g.beginPath(); g.moveTo(X0, yb); g.lineTo(X0, yt); g.lineTo(X1, yt); g.lineTo(X1, yb); g.stroke();
   });
   // dust puffs
   g.lineWidth = Math.max(1.5, 2.2 * s);
@@ -868,8 +1196,13 @@ function render() {
   // runner
   const { B1, hipUp, face } = figureFor(R);
   const hx = SX(R.x), hy = SY(R.y + hipUp);
-  g.save(); g.translate(hx, hy); g.scale(s, s); drawRunner(g, B1, face); g.restore();
-  if (state === 'play' || state === 'dying') drawHUD();
+  g.save(); g.translate(hx, hy); g.scale(s, s); drawRunner(g, B1, face); drawGear(g, B1, gearFor(R.got)); g.restore();
+  pops.forEach(p => {                                  // trick names float up from where he landed
+    const a = Math.min(1, (1.5 - p.t) / 0.4, p.t / 0.08 + 0.3), x = clamp(SX(p.x) + 20, 90, W - 90);
+    g.save(); g.globalAlpha = a; g.fillStyle = p.small ? '#777' : INK; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `700 ${p.small ? 20 : (W < 500 ? 26 : 32)}px ${FONT}`; g.fillText(p.text, x, Math.max(SAFE.t + 110, SY(p.y + 140)) - p.t * 30); g.restore();
+  });
+  if (state === 'play' || state === 'dying' || state === 'pick') drawHUD();
 }
 function drawClouds(g, s, base) {
   g.save(); g.strokeStyle = '#c8c8c8'; g.lineWidth = Math.max(1.5, 2.4 * s);
@@ -889,9 +1222,9 @@ function drawHUD() {
   g.save(); g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK; g.fillStyle = INK;
   const pad = 12, Lx = SAFE.l + pad, T = SAFE.t + pad, Rx = W - SAFE.r - pad, small = W < 420 || H < 420;
   g.textBaseline = 'top'; g.textAlign = 'left';
-  g.font = `700 ${small ? 30 : 38}px ${FONT}`; g.fillText(`${R.score.toLocaleString()} m`, Lx, T - 4);
+  g.font = `700 ${small ? 30 : 38}px ${FONT}`; g.fillText(`${R.score.toLocaleString()} pts`, Lx, T - 4);
   g.font = `700 ${small ? 15 : 17}px ${FONT}`; g.fillStyle = R.newBest ? INK : '#8a8a8a';
-  g.fillText(R.newBest ? 'new best!' : `best ${bestNow.toLocaleString()} m`, Lx + 2, T + (small ? 28 : 36));
+  g.fillText((R.newBest ? 'new best!' : `best ${bestNow.toLocaleString()}`) + `  ·  ${Math.floor(R.dist).toLocaleString()} m`, Lx + 2, T + (small ? 28 : 36));
   // sprint meter, top right under the restart button
   g.fillStyle = INK;
   const bw = small ? 90 : 120, bh = 14, bx = Rx - bw, by = T + 60;
@@ -915,9 +1248,18 @@ function drawHUD() {
       g.fillText(label, x + pw / 2, py + ph / 2 + 2);
     };
     padAt(SAFE.l + 14, 'sprint', input.sprint); padAt(W - SAFE.r - 14 - pw, 'jump', input.jump);
+    if (R.got.includes('trick')) {                     // the trick pad, just above sprint: dark when a trick is possible
+      const ty = trickPadY(), ready = trickReady();
+      g.save(); g.setLineDash([7, 7]); g.lineWidth = 2.5; g.strokeStyle = ready || input.trick ? INK : '#b4b4b4';
+      rrect(g, SAFE.l + 14, ty, pw, ph, 16); g.fillStyle = input.trick ? '#ececec' : 'rgba(255,255,255,0.6)';   // see-through, so the roofs behind still show g.fill(); g.stroke(); g.restore();
+      g.fillStyle = ready || input.trick ? INK : '#b0b0b0'; g.font = `700 ${small ? 22 : 26}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('trick', SAFE.l + 14 + pw / 2, ty + ph / 2 + 2);
+    }
   }
   g.restore();
 }
+
+const padH = () => Math.min(64, H * 0.12), padY = () => H - SAFE.b - padH() - 40, trickPadY = () => padY() - padH() - 14;
 
 // ---------- Overlay art ----------
 function mini(canvas, fn) {
@@ -948,6 +1290,7 @@ function drawOverlayArt() {
     g.font = `700 14px ${FONT}`; g.fillStyle = INK; g.textAlign = 'center';
     g.fillText('jump!', 123, 22); g.fillText('sprint for', 246, gy - 66); g.fillText('big walls!', 246, gy - 52);
   });
+  if (!$('cardOv').classList.contains('hidden')) cardShown.forEach(cardArt);
   if (!$('deadOv').classList.contains('hidden')) mini($('deadArt'), g => {
     const gy = 92, k = 1.05;
     g.lineWidth = 2.6; g.beginPath(); g.moveTo(20, gy); g.lineTo(140, gy); g.stroke();
@@ -956,14 +1299,14 @@ function drawOverlayArt() {
   });
 }
 // a cheerful runner for the leaderboard spots
-function drawFit(cvs) {
+function drawFit(cvs, muts = []) {
   const g = cvs.getContext('2d'), Wc = cvs.width, Hc = cvs.height;
   g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, Wc, Hc);
   const k = Hc / 120;
   g.lineCap = 'round'; g.lineJoin = 'round';
   g.lineWidth = 3 * k; g.strokeStyle = INK; g.beginPath(); g.moveTo(Wc * 0.18, Hc * 0.9); g.lineTo(Wc * 0.82, Hc * 0.9); g.stroke();
   const P = runCycle(0.32, 420), B = bones(P), drop = lowest(B);
-  g.save(); g.translate(Wc / 2 - 4 * k, Hc * 0.9 - (drop + 8) * k); g.scale(k, k); drawRunner(g, B, 'happy', 1.15); g.restore();
+  g.save(); g.translate(Wc / 2 - 4 * k, Hc * 0.9 - (drop + 8) * k); g.scale(k, k); drawRunner(g, B, 'happy', 1.15); drawGear(g, B, gearFor(muts), 1.15); g.restore();
 }
 function drawQuestion(cvs) {
   const g = cvs.getContext('2d'), Wc = cvs.width, Hc = cvs.height;
@@ -972,27 +1315,59 @@ function drawQuestion(cvs) {
   g.fillStyle = '#bbb'; g.font = `700 ${Math.round(Hc * 0.42)}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('?', Wc / 2, Hc / 2 + 2);
 }
 
+// ---------- Skill Card picker ----------
+let cardShown = [];
+function offerCards(list, at) {
+  state = 'pick'; clearInput(); cardShown = list;
+  $('cardMsg').textContent = list.length > 1 ? `You ran ${at} m! Pick a Skill Card:` : `You ran ${at} m! Here's a new Skill Card:`;
+  $('cardNote').textContent = touch ? 'tap the card to take it' : 'click the card (or press 1, 2, 3 or Enter)';
+  const box = $('cardList'); box.innerHTML = ''; box.classList.toggle('few', list.length < 3);
+  list.forEach(c => {
+    const b = document.createElement('button'); b.className = 'mut';
+    b.innerHTML = `<canvas width="320" height="240"></canvas><i>${c.tag}</i><b>${c.name}</b><p>${c.desc}</p>`;
+    b.onclick = () => takeCard(c); box.appendChild(b); c.cvs = b.querySelector('canvas');
+  });
+  show('cardOv', true); $('cardOv').querySelector('.card').scrollTop = 0;
+}
+function takeCard(c) {
+  if (state !== 'pick') return;
+  R.got.push(c.id); show('cardOv', false); clearInput(); state = 'play';
+  toast(c.name + '!');
+}
+// the little demo on each card: he runs, jumps and does the card's trick
+function cardArt(c) {
+  mini(c.cvs, g => {
+    const gy = 112, k = 0.68, cyc = 1.5, t = time % cyc, v = 300;
+    g.lineWidth = 2.6; g.beginPath(); g.moveTo(20, gy); g.lineTo(140, gy); g.stroke();
+    const tr = c.demo === 'trick2' ? TRICKS_PRO[2] : TRICKS[0], air = tr.dur + 0.14, v0 = 1000 * air;
+    const h = t < air ? v0 * t - 1000 * t * t : 0;
+    const base = lerpRig(runRig(time * 2.6, v), airRig(time * 1.8, v), t < air ? 0.8 : 0, 'keep');
+    const fig = t > 0.05 && t < 0.05 + tr.dur ? trickFigure(base, tr, t - 0.05) : { B1: bones(rigToPose(base)), hipUp: base.H };
+    g.save(); g.translate(80, gy - (h * 0.28 + fig.hipUp) * k); g.scale(k, k); drawRunner(g, fig.B1); drawGear(g, fig.B1, gearFor(c.id === 'trick2' ? ['trick', 'trick2'] : [c.id])); g.restore();
+  });
+}
+
 // ---------- Flow ----------
 function show(id, on) { $(id).classList.toggle('hidden', !on); }
 function startRun() { show('startOv', false); show('brand', true); show('restartBtn', true); resetGame(); state = 'play'; clearInput(); }
 function toMainMenu() {
   if (state === 'play') saveBest();
   state = 'start'; clearInput();
-  show('deadOv', false); show('brand', false); show('restartBtn', false);
+  show('deadOv', false); show('cardOv', false); show('brand', false); show('restartBtn', false);
   closeEntry(); resetGame(); refreshBoard(diffKey, true); showBestLine(); show('startOv', true);
 }
 function die(cause) {
   if (state !== 'play') return;
   state = 'dying'; deathCause = cause; deathT = 0; clearInput();
-  R.touch = R.roll = R.xf = null;
+  R.touch = R.roll = R.xf = R.trick = R.crash = null;
   if (cause === 'squish') { R.mode = 'squish'; R.x = cam.x + HW * 0.45 + 2; puff(R.x, R.y + 40, 5); }
   else { R.mode = 'dead-fall'; R.pred = null; }
   saveBest();
   $('deadMsg').textContent = cause === 'squish'
-    ? `Squish! A wall stopped you and the screen caught up after ${R.score.toLocaleString()} m.`
-    : `You fell down a hole after ${R.score.toLocaleString()} m.`;
-  $('deadScore').textContent = (R.newBest ? 'New high score! ' : 'Score: ') + `${R.score.toLocaleString()} m`;
-  $('deadBest').textContent = R.newBest ? '' : `Best on ${diffKey}: ${bestNow.toLocaleString()} m`;
+    ? `Squish! A wall stopped you and the screen caught up after ${Math.floor(R.dist).toLocaleString()} m.`
+    : `You fell down a gap after ${Math.floor(R.dist).toLocaleString()} m.`;
+  $('deadScore').textContent = (R.newBest ? 'New high score! ' : 'Score: ') + `${R.score.toLocaleString()} pts`;
+  $('deadBest').textContent = R.newBest ? '' : `Best on ${diffKey}: ${bestNow.toLocaleString()} pts`;
   closeEntry(); offerEntry();
   setTimeout(() => { if (state === 'dying') { state = 'dead'; show('deadOv', true); } }, 900);
 }
@@ -1035,15 +1410,17 @@ async function fetchBoard(k, n = 3) {
     try {
       const f = row.document.fields, name = f.name.stringValue, score = parseInt(f.score.integerValue, 10);
       if (!/^[A-Z]{3}$/.test(name) || !(score > 0)) continue;
-      out.push({ name, score });
+      const muts = ((f.muts && f.muts.arrayValue && f.muts.arrayValue.values) || []).map(v => v.stringValue).filter(m => typeof m === 'string');
+      out.push({ name, score, muts });
     } catch (_) {}
   }
   return out;
 }
-async function submitScore(k, e) {   // same document shape as the Evolution boards (muts empty, top false)
+async function submitScore(k, e) {   // same document shape as the Evolution boards (muts = his Skill Cards, top false)
+  const muts = (e.muts || []).length ? { arrayValue:{ values: e.muts.map(m => ({ stringValue:m })) } } : { arrayValue:{} };
   const r = await fetch(fsURL('/' + BOARD + k), { method:'POST', headers:{ 'Content-Type':'application/json' },
     body: JSON.stringify({ fields:{ name:{ stringValue:e.name }, score:{ integerValue:String(e.score) },
-      muts:{ arrayValue:{} }, top:{ booleanValue:false }, v:{ stringValue:VERSION } } }) });
+      muts, top:{ booleanValue:false }, v:{ stringValue:VERSION } } }) });
   if (!r.ok) throw new Error('save ' + r.status);
 }
 function refreshBoard(k, force) {
@@ -1066,9 +1443,9 @@ function showBoard(k) {
     for (let i = 0; i < 10; i++) {
       const e = list[i], r = document.createElement('div');
       r.className = 't10row' + (e ? '' : ' empty') + (e && rec && rec.name === e.name && rec.score === e.score ? ' me' : '');
-      r.innerHTML = `<i>${['1st', '2nd', '3rd'][i] || (i + 1) + 'th'}</i><canvas width="192" height="112"></canvas><b>${e ? e.name : '???'}</b><span>${e ? e.score.toLocaleString() + ' m' : ''}</span>`;
+      r.innerHTML = `<i>${['1st', '2nd', '3rd'][i] || (i + 1) + 'th'}</i><canvas width="192" height="112"></canvas><b>${e ? e.name : '???'}</b><span>${e ? e.score.toLocaleString() : ''}</span>`;
       box.appendChild(r);
-      const c = r.querySelector('canvas'); if (e) drawFit(c); else drawQuestion(c);
+      const c = r.querySelector('canvas'); if (e) drawFit(c, e.muts); else drawQuestion(c);
     }
     lbCache[k] = { list:list.slice(0, 3), at:Date.now() };
   }).catch(() => { if (boardKey === k) $('boardNote').textContent = 'leaderboard is napping, try again later'; });
@@ -1084,15 +1461,15 @@ function showBestLine() {
   const row = $('lbRow'); row.innerHTML = '';
   ['1st', '2nd', '3rd'].forEach((place, i) => {
     const e = list[i], d = document.createElement('div'); d.className = 'lbc' + (e ? '' : ' empty');
-    d.innerHTML = `<i>${place}</i><canvas width="168" height="112"></canvas><b>${e ? e.name : '???'}</b><span>${e ? e.score.toLocaleString() + ' m' : ''}</span>`;
+    d.innerHTML = `<i>${place}</i><canvas width="168" height="112"></canvas><b>${e ? e.name : '???'}</b><span>${e ? e.score.toLocaleString() : ''}</span>`;
     row.appendChild(d);
-    const cvs = d.querySelector('canvas'); if (e) drawFit(cvs); else drawQuestion(cvs);
+    const cvs = d.querySelector('canvas'); if (e) drawFit(cvs, e.muts); else drawQuestion(cvs);
   });
   const rec = loadRec(diffKey), b = Math.max(loadBest(diffKey), rec ? rec.score : 0), you = $('youRow');
   if (b > 0) {
     const same = rec && rec.score >= b;
-    you.innerHTML = `<i>your best</i><canvas width="120" height="80"></canvas><b>${same && rec.name ? rec.name : '???'}</b><span>${b.toLocaleString()} m</span>`;
-    drawFit(you.querySelector('canvas'));
+    you.innerHTML = `<i>your best</i><canvas width="120" height="80"></canvas><b>${same && rec.name ? rec.name : '???'}</b><span>${b.toLocaleString()}</span>`;
+    drawFit(you.querySelector('canvas'), same && rec.muts ? rec.muts : []);
   } else you.innerHTML = `<i>your best: no score yet on ${diffKey}</i>`;
   refreshBoard(diffKey);
 }
@@ -1103,13 +1480,14 @@ function offerEntry() {
   const s = R.score, k = diffKey;
   const mine = s > 0 && s > bestAtStart, c = lbCache[k];
   const onBoard = LB_ON && s > 0 && (!c || c.list.length < 3 || s > c.list[c.list.length - 1].score);
-  if (mine) saveRec(k, { score:s, name:savedName() });
+  const muts = [...R.got];
+  if (mine) saveRec(k, { score:s, name:savedName(), muts });
   const box = $('entry');
   if (!mine && !onBoard) { box.classList.add('hidden'); return; }
-  entryRun = { k, score:s, mine };
+  entryRun = { k, score:s, mine, muts };
   $('deadBest').after(box);
   $('entryMsg').textContent = onBoard && c ? 'You made the top 3!' : '';
-  drawFit($('entryArt'));
+  drawFit($('entryArt'), muts);
   const n = savedName(); initials().forEach((inp, i) => { inp.value = n[i] || ''; inp.disabled = false; });
   $('initials').classList.remove('hidden'); $('entryAsk').classList.remove('hidden');
   $('saveBtn').classList.remove('hidden'); $('saveBtn').disabled = false; $('saveNote').textContent = '';
@@ -1135,7 +1513,7 @@ $('saveBtn').onclick = async () => {
   $('saveBtn').disabled = true; initials().forEach(i => { i.disabled = true; i.blur(); });
   if (LB_ON) {
     $('saveNote').textContent = 'saving...';
-    try { await submitScore(run.k, { name, score:run.score }); $('saveNote').textContent = 'Saved! Look for it on the main menu!'; }
+    try { await submitScore(run.k, { name, score:run.score, muts:run.muts }); $('saveNote').textContent = 'Saved! Look for it on the main menu!'; }
     catch (_) { $('saveNote').textContent = "Couldn't reach the leaderboard, but it's saved on this device."; }
     delete lbCache[run.k]; refreshBoard(run.k, true);
   } else $('saveNote').textContent = 'Saved on this device!';
@@ -1150,28 +1528,36 @@ function setDiff(k) {
   showBestLine();
 }
 document.querySelectorAll('#diffs .diff').forEach(b => b.onclick = () => setDiff(b.dataset.d));
-$('ctrlHint').textContent = touch ? 'Right side to jump, hold left side to sprint' : 'Space to jump, hold Shift to sprint';
+$('ctrlHint').textContent = touch ? 'Right side to jump, hold left side to sprint' : 'Space to jump, hold Shift to sprint, Down for tricks';
 
 // ---------- Input ----------
-const ptrs = new Map();   // pointerId -> 'jump' | 'sprint'
+const ptrs = new Map();   // pointerId -> 'jump' | 'sprint' | 'trick'
 function syncPtrs() {
   input.sprint = keyS.size > 0 || [...ptrs.values()].includes('sprint');
   input.jump = keyJ.size > 0 || [...ptrs.values()].includes('jump');
+  input.trick = keyT.size > 0 || [...ptrs.values()].includes('trick');
 }
-const keyJ = new Set(), keyS = new Set();
-function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); input.jump = input.sprint = input.jumpPressed = false; }
+const keyJ = new Set(), keyS = new Set(), keyT = new Set();
+function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); keyT.clear(); input.jump = input.sprint = input.jumpPressed = input.trick = input.trickPressed = false; }
 cv.addEventListener('pointerdown', e => {
   if (state !== 'play') return;
-  const role = e.clientX < W / 2 ? 'sprint' : 'jump';
-  ptrs.set(e.pointerId, role); if (role === 'jump') input.jumpPressed = true;
+  // left side: the trick pad (once you have it) is the band just above the sprint pad; the rest sprints
+  const ty = trickPadY(), onTrick = R.got.includes('trick') && e.clientY >= ty - 26 && e.clientY < ty + padH() + 7;
+  const role = e.clientX >= W / 2 ? 'jump' : onTrick ? 'trick' : 'sprint';
+  ptrs.set(e.pointerId, role); if (role === 'jump') input.jumpPressed = true; if (role === 'trick') input.trickPressed = true;
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
   syncPtrs(); e.preventDefault();
 });
 const endPtr = e => { ptrs.delete(e.pointerId); syncPtrs(); };
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('contextmenu', e => e.preventDefault());
-const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'], SPRINT_KEYS = ['ShiftLeft', 'ShiftRight', 'ArrowRight', 'KeyD'];
+const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'], SPRINT_KEYS = ['ShiftLeft', 'ShiftRight', 'ArrowRight', 'KeyD'], TRICK_KEYS = ['ArrowDown', 'KeyS', 'KeyE'];
 window.addEventListener('keydown', e => {
+  if (state === 'pick') {                             // the card picker: 1, 2, 3 pick a card; Enter / Space takes the first
+    const n = { Digit1:0, Digit2:1, Digit3:2, Numpad1:0, Numpad2:1, Numpad3:2, Enter:0, Space:0 }[e.code];
+    if (n !== undefined && cardShown[n]) { e.preventDefault(); takeCard(cardShown[n]); }
+    return;
+  }
   if (e.code === 'Enter' || (e.code === 'Space' && state !== 'play')) {
     for (const [ov, sel] of [['howOv', '#howClose'], ['boardOv', '#boardBack'], ['startOv', '#startBtn'], ['deadOv', '#againBtn']])
       if (!$(ov).classList.contains('hidden')) { e.preventDefault(); document.querySelector(sel).click(); return; }
@@ -1179,9 +1565,10 @@ window.addEventListener('keydown', e => {
   if (state !== 'play') return;
   if (JUMP_KEYS.includes(e.code)) { if (!e.repeat) input.jumpPressed = true; keyJ.add(e.code); e.preventDefault(); }
   if (SPRINT_KEYS.includes(e.code)) { keyS.add(e.code); e.preventDefault(); }
+  if (TRICK_KEYS.includes(e.code)) { if (!e.repeat) input.trickPressed = true; keyT.add(e.code); e.preventDefault(); }
   syncPtrs();
 });
-window.addEventListener('keyup', e => { keyJ.delete(e.code); keyS.delete(e.code); syncPtrs(); });
+window.addEventListener('keyup', e => { keyJ.delete(e.code); keyS.delete(e.code); keyT.delete(e.code); syncPtrs(); });
 window.addEventListener('blur', clearInput);
 
 // ---------- Loop ----------
