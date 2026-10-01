@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Evolution Game v16.0</title>
+<title>Doodle Evolution Game v17.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -167,10 +167,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Evolution Game</div><div class="v">v16.0</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Evolution Game</div><div class="v">v17.0</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Evolution Game</h1><div class="ver">v16.0</div>
+  <h1>Doodle Evolution Game</h1><div class="ver">v17.0</div>
   <canvas id="startArt" width="320" height="240"></canvas>
   <p>You're a teeny tiny cell!<br>Eat creatures your size or smaller.<br>Avoid the grumpy ones.</p>
   <div class="diffs" id="diffs">
@@ -213,7 +213,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <p>Some level ups make you bigger, and some let you pick a <b>mutation</b>: a new trick like swimming faster, biting harder or hiding better. Simpler mutations are listed first, just like real evolution. Mutations can keep evolving into stronger versions, so try different picks each game and find your favourite combo!</p>
   <h3>Score</h3>
   <p>Every snack scores points, and the faster you play, the bigger your bonus. Make it all the way to the Top of the Pond for a big speed bonus, then a <b>5-second feeding frenzy</b> to squeeze in every last point!</p>
-  <p>Different builds score in different ways! Gobble snacks in a quick <b>combo</b>, stay <b>comfy</b> at full health, be <b>sneaky</b> and catch prey before it sees you, or give big biters some <b>payback</b>.</p>
+  <p>Different builds score in different ways! Gobble snacks in a quick <b>combo</b>, catch them at full <b>zoom</b>, stay <b>comfy</b> at full health, be <b>sneaky</b> and catch prey before it sees you, or give big biters some <b>payback</b>.</p>
   <p>Beat the <b>top 3</b> (or your own best) and pop in your 3 letters. Your creature shows on the leaderboard, with a crown if you made it to the Top of the Pond!</p>
   <h3>Controls</h3>
   <div class="ctrls">
@@ -275,7 +275,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <script>
 (() => {
 'use strict';
-const VERSION = '16.0';
+const VERSION = '17.0';
 const TAU = Math.PI * 2;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -1050,19 +1050,20 @@ function puff(x, y, r) {
 
 function eat(c) {
   const T = TYPES[c.level], gain = T.xp;
-  const comfy = isFull(), sneaky = !c.spooked;      // checked before this snack heals you
+  const comfy = isFull(), sneaky = !c.spooked, zoom = isZoom();   // checked before this snack heals you
   player.comboN = player.comboT > 0 ? Math.min(5, player.comboN + 1) : 0; player.comboT = 2;
   player.xp += gain; eaten++;
   const rel = T.xp / TYPES[Math.max(1, sizeTier(player.size))].xp;   // snack size compared with you
   player.health = Math.min(maxHP(player), player.health + maxHP(player) * Math.max(0.015, 0.065 * Math.min(1.3, rel)) * DIFF.heal);
   player.chomp = 0.25;
   puff(c.x, c.y, c.r);
-  const pts = Math.round(gain * 10 * scoreMult() * comboMult() * (comfy ? 1.5 : 1) * (sneaky ? 1.5 : 1));
+  const pts = Math.round(gain * 10 * scoreMult() * comboMult() * (comfy ? 1.5 : 1) * (sneaky ? 1.3 : 1) * (zoom ? 1.5 : 1));
   addScore(pts);
   addText(c.x, c.y - c.r, player.locked ? 'yum!' : `+${pts}`);
   if (!player.locked) {                            // little style-bonus words floating up above the points
     let y = c.y - c.r - 24; const tag = w => { addText(c.x, y, w, 18); y -= 20; };
     if (player.comboN) tag(`combo x${comboMult().toFixed(1)}!`);
+    if (zoom) tag('zoom!');
     if (comfy) tag('comfy!');
     if (sneaky) tag('sneaky!');
   }
@@ -1071,22 +1072,24 @@ function eat(c) {
 
 // ---------- Score ----------
 // Every snack is worth XP x 10, times a speed bonus that starts at x2 and slides to x1 over 15 minutes,
-// times style bonuses: Combo (quick snacks, up to x2), Comfy (eaten at full health, x1.5) and Sneaky (prey never got scared, x1.5).
+// times style bonuses: Combo (quick snacks, up to x2), Comfy (eaten at full health, x1.5), Zoom (caught at tail-powered speed, x1.5)
+// and Sneaky (prey never got scared, x1.3).
 // Payback: spine pricks and Jaw chomps on bigger creatures score points too.
 // Reaching Top of the Pond adds 6 points for every second left under 40 minutes.
 let bestNow = 0, bestAtStart = 0;
 function scoreMult() { return 1 + Math.max(0, 1 - player.t / 900); }
 const comboMult = () => player.comboT > 0 ? 1 + 0.2 * player.comboN : 1;
 const isFull = () => player.health >= maxHP(player) - 0.01;
-function liveMult() { return scoreMult() * comboMult() * (isFull() ? 1.5 : 1); }   // what the HUD shows
+const isZoom = () => player.speed >= (BASE_SPEED + (player.size - 1) * 14) * 1.25;   // only a tail gets you this fast
+function liveMult() { return scoreMult() * comboMult() * (isFull() ? 1.5 : 1) * (isZoom() ? 1.5 : 1); }   // what the HUD shows
 function payback(c) {                               // a prick or chomp on something bigger than you
   if (player.locked) return;
   const pts = Math.round(TYPES[c.level].xp * 5 * scoreMult());
   addScore(pts); addText(c.x, c.y - c.r - 26, `payback! +${pts}`, 20);
 }
-function loadBest(k) { try { return parseInt(localStorage.getItem('evo2_best_' + k), 10) || 0; } catch (_) { return 0; } }
+function loadBest(k) { try { return parseInt(localStorage.getItem('evo3_best_' + k), 10) || 0; } catch (_) { return 0; } }
 function saveBest() {
-  if (player.score >= bestNow && player.score > 0) try { localStorage.setItem('evo2_best_' + diffKey, String(player.score)); } catch (_) {}
+  if (player.score >= bestNow && player.score > 0) try { localStorage.setItem('evo3_best_' + diffKey, String(player.score)); } catch (_) {}
 }
 function addScore(n) {
   if (player.locked) return;                       // after the frenzy the score is final
@@ -1599,12 +1602,12 @@ const touch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in windo
 // Leave these blank and the board just shows as offline; your own best still works (it's kept on this device).
 const FIREBASE = { apiKey:'AIzaSyD6hux9hQsFsfnYTGCTbo4EBDbfo8O8my8', projectId:'doodle-games-8beba' };
 const LB_ON = !!(FIREBASE.apiKey && FIREBASE.projectId);
-const BOARD = 'evolution2_';                        // v15.0 scoring started fresh boards (old ones: evolution_)
+const BOARD = 'evolution3_';                        // fresh boards when scoring changes (v15.0: evolution2_, v17.0: evolution3_)
 const lbCache = {};                                   // diff -> { list:[{name,score,muts,top}], at:time }
 const fsURL = p => `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents${p}?key=${FIREBASE.apiKey}`;
 const savedName = () => { try { const n = localStorage.getItem('evo_name'); return /^[A-Z]{3}$/.test(n) ? n : ''; } catch (_) { return ''; } };
-function loadRec(k) { try { const r = JSON.parse(localStorage.getItem('evo2_bestrec_' + k)); return r && r.score > 0 ? r : null; } catch (_) { return null; } }
-function saveRec(k, r) { try { localStorage.setItem('evo2_bestrec_' + k, JSON.stringify(r)); } catch (_) {} }
+function loadRec(k) { try { const r = JSON.parse(localStorage.getItem('evo3_bestrec_' + k)); return r && r.score > 0 ? r : null; } catch (_) { return null; } }
+function saveRec(k, r) { try { localStorage.setItem('evo3_bestrec_' + k, JSON.stringify(r)); } catch (_) {} }
 async function fetchBoard(k, n = 3) {
   const r = await fetch(fsURL(':runQuery'), { method:'POST', headers:{ 'Content-Type':'application/json' },
     body: JSON.stringify({ structuredQuery:{ from:[{ collectionId:BOARD + k }], orderBy:[{ field:{ fieldPath:'score' }, direction:'DESCENDING' }], limit:n } }) });
