@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Runner Game v5.0</title>
+<title>Doodle Runner Game v6.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -166,6 +166,8 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 .muts.few{display:flex;justify-content:center;gap:10px}
 .muts.few .mut{flex:0 1 230px}
 #cardOv .card.wide{max-width:560px}
+#cardOv .btn[disabled],#cardOv.wait .mut{opacity:.45;cursor:default}
+#cardOv .btn{margin-top:10px}
 .cardnote{font-size:15px;color:#888;margin-top:6px}
 .card canvas#startArt{width:200px;height:110px}
 .how canvas#howArt{width:300px;height:110px}
@@ -177,10 +179,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v5.0</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v6.1</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Runner Game</h1><div class="ver">v5.0</div>
+  <h1>Doodle Runner Game</h1><div class="ver">v6.1</div>
   <canvas id="startArt" width="400" height="220"></canvas>
   <p>Run, run, run across the rooftops!<br>Leap the gaps and hop the AC units.<br>How far can you go?</p>
   <div class="diffs" id="diffs">
@@ -217,19 +219,21 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <h3>Watch out!</h3>
   <p>Fall down a gap between buildings and it's game over. Bump into a wall or a rooftop thing and you'll stop, so jump it quickly before the screen squishes you against the edge!</p>
   <h3>Skill Cards</h3>
-  <p>Run far enough and you'll find a <b>Skill Card</b>! There's a new one at <b>250, 600, 1000, 1500, 2100 and 2800 m</b>, each with a new move and a little bit of gear. Once you have a move, bigger gaps and walls start to turn up!</p>
+  <p>Run far enough and you'll find a <b>Skill Card</b>! There's a new one at <b>250, 600, 1000, 1500, 2100, 2800, 3600 and 4500 m</b>, each with a new move and a little bit of gear. Once you have a move, bigger gaps and walls start to turn up!</p>
   <h3>Tricks</h3>
   <p>With the <b>Trick</b> card (and its backwards cap!), press <b>sprint</b> again <b>in the air</b> to flip, spin or cartwheel. You need lots of air: a <b>sprint jump</b>, or a jump down onto a lower roof. Land it for bonus points! Leave it too late and you'll tumble, and it takes a second to get back up.</p>
   <h3>Double Jump</h3>
   <p>With the <b>Double Jump</b> card (winged sneakers!), tap <b>jump</b> again in the air to jump once more. <b>Hermes Wings</b> give you a third jump!</p>
   <h3>Floaty Cape</h3>
   <p>With the <b>Floaty Cape</b>, <b>hold jump</b> while you're coming down to float gently over big gaps. Each jump gets about a second and a half of floating (more with the <b>Super Cape</b>).</p>
+  <h3>Grapply Gripper</h3>
+  <p>A grapple on your wrist! When a ring on a crane or on top of a tall wall goes <b>ping</b>, press <b>grab</b> to fire it. Crane rings swing you across big gaps (you let go at the top of the swing, or press <b>jump</b> to let go early). Wall rings pull you right up to the top. The <b>Super Double</b> one has a grapple on each arm, so you can grab the next ring while you swing!</p>
   <h3>Score</h3>
   <p>Every metre you run scores a point, and landed tricks score lots more. The screen slowly gets faster the further you go. Beat the <b>top 3</b> (or your own best) and pop in your 3 letters for the leaderboard!</p>
   <h3>Controls</h3>
   <div class="ctrls">
-    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint. Once you have tricks, touch the <b>left side</b> again in the air to do one. Tap the <b>right side</b> in the air to double jump, and hold it to float.</p></div>
-    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. Once you have tricks, press sprint again <b>in the air</b> to do one. Tap jump in the air to double jump, and hold it to float. <b>Enter</b> presses the big button.</p></div>
+    <div class="ctrl"><b>Phone</b><p>Touch the <b>right side</b> of the screen to jump. Hold the <b>left side</b> to sprint. Once you have tricks, touch the <b>left side</b> again in the air to do one. Tap the <b>right side</b> in the air to double jump, and hold it to float. With the Grapply Gripper, a <b>grab!</b> button pops up above sprint when a ring is in reach.</p></div>
+    <div class="ctrl"><b>Desktop</b><p><b>Space</b>, <b>W</b> or <b>Up</b> to jump. Hold <b>Shift</b>, <b>D</b> or <b>Right</b> to sprint. Once you have tricks, press sprint again <b>in the air</b> to do one. Tap jump in the air to double jump, and hold it to float. <b>E</b> (or <b>S</b> / <b>Down</b>) to grab. <b>Enter</b> presses the big button.</p></div>
   </div>
   <p>The <b>restart</b> button (top right) asks "sure?" first, so tap it twice.</p>
   <div class="center"><button class="btn" id="howClose">Got it!</button></div>
@@ -250,6 +254,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <div class="overlay hidden" id="cardOv"><div class="card wide">
   <h2>New Skill Card!</h2><p id="cardMsg"></p>
   <div class="muts" id="cardList"></div>
+  <button class="btn" id="takeBtn">Take it!</button>
   <div class="cardnote" id="cardNote"></div>
 </div></div>
 
@@ -281,7 +286,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <script>
 (() => {
 'use strict';
-const VERSION = '5.0';
+const VERSION = '6.1';
 const TAU = Math.PI * 2, D = Math.PI / 180;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -531,7 +536,8 @@ function applyTouch(rig, Rn) {
 }
 
 function pl(g, pts, w) { g.lineWidth = w; g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]); g.stroke(); }
-// face: 'happy' (sparkly eyes + smile), 'oops' (> < eyes + little o), 'dizzy' (swirly eyes)
+// face: 'happy' (sparkly eyes + smile), 'joy' (^ ^ + big smile), 'scared' (round worried eyes + o + sweat drop),
+// 'oops' (> < eyes + little o), 'dizzy' (swirly eyes)
 function drawRunner(g, B, face = 'happy', k = 1) {
   g.strokeStyle = INK; g.lineCap = 'round'; g.lineJoin = 'round';
   pl(g, B.arms[1], 3.6 * k); pl(g, B.legs[1], 3.8 * k);
@@ -543,7 +549,26 @@ function drawRunner(g, B, face = 'happy', k = 1) {
   const P = (fw, u) => [B.head[0] + (f[0] * fw + up[0] * u) * q, B.head[1] + (f[1] * fw + up[1] * u) * q];
   const rot = Math.atan2(f[1], f[0]);
   g.fillStyle = INK;
-  if (face === 'happy') {
+  if (face === 'scared') {                            // big round worried eyes, a little o mouth, a sweat drop
+    g.lineWidth = 1.6 * k;
+    [[7.2, 1.8], [-0.6, 2.2]].forEach(([fw, u]) => {
+      const [x, y] = P(fw, u);
+      g.beginPath(); g.ellipse(x, y, 3.1 * q, 3.4 * q, rot, 0, TAU); g.fillStyle = '#fff'; g.fill(); g.stroke();
+      const [px, py] = P(fw + 0.5, u - 0.3); g.beginPath(); g.arc(px, py, 1.25 * q, 0, TAU); g.fillStyle = INK; g.fill();
+    });
+    const [mx, my] = P(3.6, -5.4);
+    g.beginPath(); g.ellipse(mx, my, 1.7 * q, 2.4 * q, rot, 0, TAU); g.stroke();
+    const [tx, ty] = P(19, 10), [bx, by] = P(19.5, 3.2), r = 2.4 * q;                                // a sweat drop just in front of his face: point at the top
+    g.beginPath(); g.moveTo(tx, ty); g.quadraticCurveTo(bx + r * 1.3, by - r * 0.2, bx, by + r); g.quadraticCurveTo(bx - r * 1.3, by - r * 0.2, tx, ty); g.stroke();
+  } else if (face === 'joy') {                         // ^ ^ eyes and a big open smile
+    g.lineWidth = 1.9 * k;
+    [[7.2, 1.2], [-0.6, 1.6]].forEach(([fw, u]) => {
+      const [ax, ay] = P(fw - 2.7, u - 0.8), [cx, cy] = P(fw, u + 3.2), [bx, by] = P(fw + 2.7, u - 0.8);
+      g.beginPath(); g.moveTo(ax, ay); g.quadraticCurveTo(cx, cy, bx, by); g.stroke();
+    });
+    const [mx, my] = P(3.4, -3.4);
+    g.beginPath(); g.arc(mx, my, 3.0 * q, rot, rot + Math.PI); g.closePath(); g.fillStyle = INK; g.fill();
+  } else if (face === 'happy') {
     (B.front ? [[3.8, 1.6, 2.5], [-3.8, 1.6, 2.5]] : [[7.2, 1.4, 2.6], [-0.6, 1.8, 2.4]]).forEach(([fw, u, r]) => {
       const [x, y] = P(fw, u);
       g.beginPath(); g.ellipse(x, y, r * q, r * 1.25 * q, rot, 0, TAU); g.fillStyle = INK; g.fill();
@@ -660,6 +685,7 @@ function drawGear(g, B, gear, k = 1) {
   g.save(); g.strokeStyle = INK; g.lineCap = 'round'; g.lineJoin = 'round';
   if (gear.wings) B.legs.forEach((leg, i) => drawSneaker(g, leg[1], leg[2], gear, i ? 0.85 : 1, k, B.front ? (i ? -1 : 1) : 0));
   if (gear.cap) drawCap(g, B, gear.cap, k);
+  if (gear.grip) { drawGripper(g, B, 0, k, gear.fired === 0); if (gear.grip > 1) drawGripper(g, B, 1, k, gear.fired === 1); }
   g.restore();
 }
 function drawCap(g, B, lvl, k) {                       // a baseball cap worn backwards
@@ -741,17 +767,42 @@ function drawCape(g, B, gear, k = 1) {
 }
 
 // ---- Skill Cards: which cards there are, when they turn up ----
-const CARD_AT = [250, 600, 1000, 1500, 2100, 2800];   // metres
+const CARD_AT = [250, 600, 1000, 1500, 2100, 2800, 3600, 4500];   // metres
 const CARDS = [                                       // given in this order, one at each stop (Kev, 1 Oct 2026)
   { id:'trick', tag:'new', name:'Trick', desc:'Press sprint in the air to flip and spin! Needs a sprint jump or a drop. Land it for points!', demo:'trick' },
   { id:'djump', tag:'new', name:'Double Jump', desc:'Winged sneakers! Tap jump again in the air to jump once more.', demo:'djump' },
   { id:'trick2', needs:'trick', tag:'upgrade', name:'Trick Pro', desc:'Doubles and corks! Bigger tricks for bigger points.', demo:'trick2' },
   { id:'cape', tag:'new', name:'Floaty Cape', desc:'Hold jump while you come down to float slowly over big gaps!', demo:'cape' },
   { id:'djump2', needs:'djump', tag:'upgrade', name:'Hermes Wings', desc:'Bigger wings: Triple Jump! Tap jump a third time in the air.', demo:'tjump' },
+  { id:'grip', tag:'new', name:'Grapply Gripper', desc:'A grapple on your wrist! When a ring goes ping, press grab to swing over gaps or zip up tall walls.', demo:'grip' },
   { id:'cape2', needs:'cape', tag:'upgrade', name:'Super Cape', desc:'A bigger cape with a little heart. Float slower, and for longer!', demo:'cape2' },
+  { id:'grip2', needs:'grip', tag:'upgrade', name:'Super Double Grapply Gripper', desc:'One on each arm! Grab the next ring while you swing and chain them like a spider.', demo:'grip2' },
 ];
 const gearFor = got => ({ cap: got.includes('trick2') ? 2 : got.includes('trick') ? 1 : 0,
-  wings: got.includes('djump2') ? 2 : got.includes('djump') ? 1 : 0, cape: got.includes('cape2') ? 2 : got.includes('cape') ? 1 : 0 });
+  wings: got.includes('djump2') ? 2 : got.includes('djump') ? 1 : 0, cape: got.includes('cape2') ? 2 : got.includes('cape') ? 1 : 0,
+  grip: got.includes('grip2') ? 2 : got.includes('grip') ? 1 : 0 });
+// ---- Grapply Gripper ----
+const GRAB_RANGE = 420, ROPE_MAX = 190, REL_A = 0.75;   // reach to a ring, longest swing line, the swing angle where he lets go
+let anchors = [], cranes = [];                         // grapple rings, and the cranes they hang from
+// the gripper: a chunky cuff on the forearm with a little claw folded at the wrist (the claw's gone while its line is out)
+function drawGripper(g, B, ai, k = 1, fired = false) {
+  const [, e, h] = B.arms[ai], dx = h[0] - e[0], dy = h[1] - e[1], l = Math.hypot(dx, dy) || 1, u = [dx / l, dy / l], n = [-u[1], u[0]];
+  const c = [e[0] + dx * 0.62, e[1] + dy * 0.62], P = (a, b) => [c[0] + u[0] * a + n[0] * b, c[1] + u[1] * a + n[1] * b];
+  g.save(); g.strokeStyle = INK; g.lineJoin = 'round'; g.lineCap = 'round';
+  g.beginPath(); [P(-6, -4.2), P(6, -4.2), P(6, 4.2), P(-6, 4.2)].forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath();
+  g.fillStyle = '#fff'; g.fill(); g.lineWidth = 2.4 * k; g.stroke();
+  g.lineWidth = 1.4 * k; g.beginPath(); const [a1, b1] = P(-2, -4.2), [a2, b2] = P(-2, 4.2); g.moveTo(a1, b1); g.lineTo(a2, b2); g.stroke();
+  const [ox, oy] = P(1.5, -1); g.beginPath(); g.arc(ox, oy, 1.4 * k, 0, TAU); g.fillStyle = INK; g.fill();
+  if (!fired) { g.lineWidth = 1.8 * k; g.beginPath();
+    for (const sd of [-1, 1]) { const [x0, y0] = P(6, sd * 2), [x1, y1] = P(10, sd * 3.4), [x2, y2] = P(12, sd * 1.6); g.moveTo(x0, y0); g.lineTo(x1, y1); g.lineTo(x2, y2); }
+    g.stroke(); }
+  g.restore();
+}
+function drawHook(g, x, y, ang, sc) {                  // the grapple hook at the end of the line: three little prongs
+  g.save(); g.translate(x, y); g.rotate(ang); g.lineWidth = Math.max(1.4, 2.2 * sc); g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -6 * sc);
+  for (const a of [-1, 0, 1]) { g.moveTo(0, -6 * sc); g.quadraticCurveTo(a * 6 * sc, -9 * sc, a * 7 * sc, -4 * sc); }
+  g.stroke(); g.restore();
+}
 // extra jumps in the air, and the cape's glide
 const EXTRA_V = 560;                                  // each extra jump (up to ~78 higher)
 const extraJumps = got => got.includes('djump2') ? 2 : got.includes('djump') ? 1 : 0;
@@ -768,15 +819,15 @@ function airFor(n) {
 let state = 'start', time = 0, runT = 0;
 let R, cam, segs, genX, genH, lastSprintX = -1e9, toasts, puffs, pops, rings, nextMilestone, deathT, deathCause;
 let bestNow = 0, bestAtStart = 0;
-const input = { jump:false, sprint:false, jumpPressed:false, trickPressed:false };
+const input = { jump:false, sprint:false, jumpPressed:false, trickPressed:false, grabPressed:false };
 
 function resetGame() {
   cam = { x:-W / baseScale() * HOME, v:DIFF.v0, gy:0, z:1 };
-  segs = []; genX = -2000; genH = 0; lastSprintX = -1e9; toasts = []; puffs = []; pops = []; rings = [];
+  segs = []; anchors = []; cranes = []; genX = -2000; genH = 0; lastSprintX = -1e9; toasts = []; puffs = []; pops = []; rings = [];
   addSeg(2000 + 900, 0);                   // a nice long flat start
   R = { x:0, y:0, vx:DIFF.v0, vy:0, ground:true, coyote:0, jumpBuf:0, cut:false, sprinting:false, stamina:STAMINA,
         apexY:0, mode:'run', p:0, ap:0, va:DIFF.v0, airT:0, spin:0, spinW:0, armNeed:0, airAmt:0, pT:null, pred:null, touch:null, roll:null, xf:null, lastRig:null,
-        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, trick:null, crash:null, trickPts:0, takeY:0, sJump:false, airHold:false, jumps:0, glideT:0, glideW:0, gliding:false, kickT:9 };
+        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, rest:null, cardName:'', trick:null, crash:null, trickPts:0, takeY:0, sJump:false, airHold:false, jumps:0, glideT:0, glideW:0, gliding:false, kickT:9, grap:null, shot:null, vault:null, gTarget:null, grabUsed:false };
   runT = 0; nextMilestone = 100; deathT = 0; deathCause = '';
   bestNow = bestAtStart = loadBest(diffKey);
   gen();
@@ -790,8 +841,15 @@ function gen() {
   const ahead = cam.x + W / scale() + 900;
   while (genX < ahead) addChunk();
   while (segs.length > 2 && segs[1].x1 < cam.x - 400) segs.shift();
+  if (anchors.length && anchors[0].x < cam.x - 900) anchors = anchors.filter(a => a.x > cam.x - 900);
+  if (cranes.length && cranes[0].jx1 < cam.x - 900) cranes = cranes.filter(c => c.jx1 > cam.x - 900);
 }
 function addChunk() {
+  // a Skill Card is due here: build a long empty roof for it (about 3.4 s of running), so it never turns up just before a jump
+  if (R && !R.rest && R.cardI < CARD_AT.length && genX / UNIT_M >= CARD_AT[R.cardI] && nextCard()) {
+    const len = Math.max(cam.v, DIFF.v0) * 3.4 + 260;
+    R.rest = { x0: genX, x1: genX + len, h: genH }; addSeg(len, genH); return;
+  }
   const v = Math.min(DIFF.vmax, cam.v + DIFF.ramp * Math.max(0, genX - R.x) / cam.v);   // screen speed when you get here
   const prog = clamp(R.dist / 1500, 0, 1), rnd = Math.random, ext = extraJumps(R.got), A1 = airFor(1), A2 = airFor(2);
   addSeg((160 + rnd() * 320) * (1 - 0.35 * prog) + v * 0.5, genH);            // room to land and line up
@@ -804,7 +862,8 @@ function addChunk() {
                 ['steps', 0.6], ['sprintHole', 1.4 * clamp((prog - 0.1) * 4, 0, 1)], ['sprintWall', 0.7 * clamp((prog - 0.2) * 4, 0, 1)],
                 ['object', 3], ['objects2', 0.8 * clamp(prog * 3, 0, 1)], ['sprintHut', 0.6 * clamp((prog - 0.2) * 4, 0, 1)],
                 ['djHole', ext >= 1 ? 1.3 : 0], ['djWall', ext >= 1 ? 0.7 : 0], ['tjHole', ext >= 2 ? 1 : 0], ['tjWall', ext >= 2 ? 0.5 : 0],
-                ['glideHole', R.got.includes('cape') ? 1 : 0]];
+                ['glideHole', R.got.includes('cape') ? 1 : 0],
+                ['craneGap', R.got.includes('grip') ? 1.2 : 0], ['ringWall', R.got.includes('grip') ? 0.8 : 0], ['craneChain', R.got.includes('grip2') ? 0.9 : 0]];
   // sprint obstacles are spaced out so your sprint has time to fill back up
   if (genX - lastSprintX < v * (STAMINA / RECHARGE + 1.2)) { pick[6][1] = 0; pick[7][1] = 0; pick[10][1] = 0; }
   let sum = pick.reduce((a, b) => a + b[1], 0), r = rnd() * sum, kind = 'hole';
@@ -812,6 +871,7 @@ function addChunk() {
   const MAXH = 340;
   if ((kind === 'wall' || kind === 'sprintWall' || kind === 'steps' || kind === 'holeUp' || kind === 'djWall') && genH > MAXH - 120) kind = 'drop';
   if (kind === 'tjWall' && genH > MAXH - 180) kind = 'drop';
+  if (kind === 'ringWall' && genH > 80) kind = 'drop';
   if ((kind === 'drop' || kind === 'holeDown') && genH < 70) kind = 'wall';
   const between = (a, b) => a + rnd() * (b - a);
   if (kind === 'sprintHole' || kind === 'sprintWall' || kind === 'sprintHut') lastSprintX = genX;
@@ -837,7 +897,18 @@ function addChunk() {
   else if (kind === 'tjHole') addSeg(between(0.62 * v * A1.t, 0.62 * v * A2.t), null);                         // needs a triple jump
   else if (kind === 'tjWall') { genH += between(0.7 * A1.h, 0.68 * A2.h); }                                     // up to ~172
   else if (kind === 'glideHole') addSeg(between(gapMax * 1.2, 0.6 * v * (JUMP_V / G + 1.1)), null);            // float across
-  if (kind === 'djHole' || kind === 'djWall' || kind === 'tjHole' || kind === 'tjWall' || kind === 'glideHole') addSeg(v * 0.5, genH);   // big moves land further on: extra room
+  else if (kind === 'craneGap' || kind === 'craneChain') {       // a crane on the roof, its jib out over a wide gap, with a ring (or two) to swing from
+    const x0 = genX, Wd = kind === 'craneGap' ? between(360, 480) : between(660, 820), ay = genH + 260;
+    const xs = kind === 'craneGap' ? [x0 + Wd * 0.42] : [x0 + Wd * 0.3, x0 + Wd * 0.72];
+    xs.forEach(x => anchors.push({ x, y: ay, kind: 'swing' }));
+    cranes.push({ mx: x0 - 70, base: genH, top: ay + 120, jx0: x0 - 170, jx1: xs[xs.length - 1] + 60, lines: xs, ay });
+    addSeg(Wd, null);
+  }
+  else if (kind === 'ringWall') {                                // a very tall wall with a ring on a post at the top: zip up
+    const wx = genX; genH += between(190, 250);
+    anchors.push({ x: wx + 16, y: genH + 30, kind: 'pull', top: genH, wx }); addSeg(v * 0.9 + 120, genH);
+  }
+  if (kind === 'djHole' || kind === 'djWall' || kind === 'tjHole' || kind === 'tjWall' || kind === 'glideHole' || kind === 'craneGap' || kind === 'craneChain') addSeg(v * 0.5, genH);   // big moves land further on: extra room
   else if (kind === 'steps') { const n = 2 + Math.floor(rnd() * 2); for (let i = 0; i < n; i++) { genH += between(30, wallMax * 0.75); addSeg(between(110, 170) + v * 0.15, genH); } }
 }
 function segsIn(a, b, fn) { for (const s of segs) { if (s.x1 <= a) continue; if (s.x0 >= b) break; fn(s); } }
@@ -867,6 +938,11 @@ function predictLanding() {
 
 // ---------- Update ----------
 function update(dt) {
+  if (state === 'count') {                            // 3, 2, 1 after taking a card; the run is paused until it ends
+    countT -= dt;
+    if (countT <= 0) { state = 'play'; clearInput(); toast('Go!'); }
+    return;
+  }
   if (state !== 'play' && state !== 'dying') return;
   const s = scale(), vw = W / s;
   if (state === 'dying') { updateDying(dt); return; }
@@ -894,20 +970,27 @@ function update(dt) {
   R.jumpBuf -= dt; R.coyote -= dt;
   if (R.jumpBuf > 0 && (R.ground || R.coyote > 0) && !R.crash) {      // you can jump out of a landing or a roll too
     const fast = R.sprinting || R.sprintT < 0.25 || R.vx > cam.v + 80;   // a sprint jump, even a split second after letting go
-    R.vy = fast ? SPRINT_JUMP_V : JUMP_V; R.ground = false; R.coyote = 0; R.jumpBuf = 0; R.cut = false; R.airHold = false;
+    R.vy = fast ? SPRINT_JUMP_V : JUMP_V; R.ground = false; R.coyote = 0; R.jumpBuf = 0; R.cut = false; R.airHold = false; R.vx = Math.max(R.vx, cam.v);
     if (R.mode !== 'air') enterAir();
     R.apexY = R.y; R.airT = 0; R.sJump = fast; R.takeY = R.y;
   }
   // an extra jump in the air (Double Jump / Hermes Wings). A press just before landing is kept for a jump off the ground.
-  if (R.jumpBuf > 0 && !R.ground && R.coyote <= 0 && !R.crash && R.jumps < extraJumps(R.got) && !(R.pred && R.pred.t < 0.1)) {
+  if (R.jumpBuf > 0 && !R.ground && R.coyote <= 0 && !R.crash && !R.grap && !R.vault && R.jumps < extraJumps(R.got) && !(R.pred && R.pred.t < 0.1)) {
     R.jumpBuf = 0; R.jumps++; R.vy = EXTRA_V; R.cut = !!R.trick; R.kickT = 0; R.apexY = R.y; R.sJump = true;   // lots of air: tricks allowed
     rings.push({ x: R.x, y: R.y, t: 0 });
   }
-  R.kickT += dt;
+  R.kickT += dt; R.joyT = Math.max(0, (R.joyT || 0) - dt);
   if (input.trickPressed) { input.trickPressed = false; tryTrick(); }
   if (!R.ground && !input.jump && R.vy > 0 && !R.cut) { R.vy *= JUMP_CUT; R.cut = true; }
   if (R.trick) R.trick.t += dt;
 
+  // the Grapply Gripper: which ring is in reach, firing, and hanging on
+  R.gTarget = findAnchor();
+  if (input.grabPressed) { input.grabPressed = false; tryGrab(); }
+  if (R.shot) { R.shot.t += dt; if (R.shot.t >= 0.12) attachGrapple(); }
+  const hanging = !!(R.grap || R.vault);
+  if (hanging) hangUpdate(dt);
+  else {
   // move sideways, stopping at walls
   let nx = R.x + R.vx * dt, blocked = false;
   segsIn(R.x - HW, nx + HW + 1, sg => {
@@ -933,12 +1016,13 @@ function update(dt) {
       if (sp !== null && R.y <= sp) { R.y = sp; R.ground = true; R.lastGround = sp; land(R.apexY - sp); }
     }
   }
+  }
   R.glideW += ((R.gliding && !R.ground ? 1 : 0) - R.glideW) * Math.min(1, dt * 7);
   rings.forEach(r => r.t += dt); rings = rings.filter(r => r.t < 0.35);
   // animation clocks: the stride follows a smoothed running speed, so speeding up and sprinting blend in
   R.va += (R.vx - R.va) * Math.min(1, dt * 5);
   if (R.ground) R.p += cycleShape(R.va).f * dt * (R.touch && R.touch.big ? 1 - 0.6 * bump(R.touch.t, TOUCH_TAU) : 1);
-  else updateAir(dt);
+  else if (!hanging) updateAir(dt);
   tickOverlays(dt);
 
   // camera height follows the ground you're on (not your jumps), and stops at the lowest ground so holes drop you out of view
@@ -956,7 +1040,7 @@ function update(dt) {
   const sc = scale();
   if (low < Infinity) target = Math.min(target, low + (floorY - base) / sc);
   target = Math.max(target, feet + 105 - (base - topY) / sc);
-  cam.gy += (target - cam.gy) * Math.min(1, dt * (R.ground ? 4 : 2.5));
+  cam.gy += (target - cam.gy) * Math.min(1, dt * (R.ground ? 4 : target > cam.gy + 30 ? 9 : 2.5));
 
   // score: metres run
   R.dist = Math.max(R.dist, R.x / UNIT_M);
@@ -968,17 +1052,21 @@ function update(dt) {
   else if (!R.ground && R.y < cam.gy - (H - groundLine()) / s - 110) die('hole');
   toasts.forEach(t => t.life -= dt); toasts = toasts.filter(t => t.life > 0);
   pops.forEach(p => p.t += dt); pops = pops.filter(p => p.t < 1.5);
-  // a Skill Card, once he's running steadily on a roof
-  if (state === 'play' && R.cardI < CARD_AT.length && R.dist >= CARD_AT[R.cardI] && R.ground && !R.crash && !R.roll && !R.touch) {
-    const at = CARD_AT[R.cardI++], next = CARDS.find(c => !R.got.includes(c.id) && (!c.needs || R.got.includes(c.needs))), open = next ? [next] : [];
-    if (open.length) offerCards(open, at);
+  // a Skill Card: once he's running steadily on the card's empty roof, with lots of clear roof still ahead
+  if (state === 'play' && R.rest) {
+    const room = R.rest.x1 - R.x, onIt = R.x >= R.rest.x0 + 30 && Math.abs(R.y - R.rest.h) < 1;
+    if (onIt && R.ground && !R.crash && !R.roll && !R.touch && room >= cam.v * 1.9 + 80) {
+      const at = CARD_AT[R.cardI++], next = nextCard(); R.rest = null;
+      if (next) offerCards([next], at);
+    } else if (R.x > R.rest.x1 - cam.v * 1.9 - 80) R.rest = null;     // missed it (still in the air, say): the level builds another one
   }
 }
+function nextCard() { return CARDS.find(c => !R.got.includes(c.id) && (!c.needs || R.got.includes(c.needs))); }
 // ---- Tricks ----
 // Allowed from a sprint jump, or when the landing is at least 50 below where he took off. The trick is picked to fit
 // the time left in the air; too late and none fit, so he tries one anyway and tumbles.
 function tryTrick() {
-  if (!R.got.includes('trick') || R.ground || R.trick || R.crash || state !== 'play') return;
+  if (!R.got.includes('trick') || R.ground || R.trick || R.crash || R.grap || R.shot || R.vault || state !== 'play') return;
   const pr = predictLanding(), drop = pr ? R.takeY - pr.h : 999;
   if (!R.sJump && drop < 50) return;                   // a little hop: sprint just does nothing in the air
   if (pr && pr.t < 0.2) return;                        // about to land: that's a sprint press for the landing, not a trick
@@ -986,10 +1074,87 @@ function tryTrick() {
   R.cut = true;                                        // committed: the jump keeps its full height
 }
 function trickReady() {                                // for the trick pad: could he trick right now?
-  if (R.ground || R.trick || R.crash) return false;
+  if (R.ground || R.trick || R.crash || R.grap || R.shot || R.vault) return false;
   const pr = R.pred; return (R.sJump || !pr || R.takeY - pr.h >= 50) && (!pr || pr.t >= TRICKS[0].dur * 0.92);   // allowed, and there's still time for one
 }
 function pop(text, small) { pops.push({ text, t:0, x:R.x, y:R.y, small }); }
+// the ring to grab: in reach, ahead and above his hand. One grab per jump (the Super Double can grab again mid-swing).
+function findAnchor() {
+  if (!R.got.includes('grip') || R.crash || R.vault || R.shot || state !== 'play') return null;
+  const dbl = R.got.includes('grip2');
+  if (R.grap && !(dbl && R.grap.kind === 'swing')) return null;
+  if (!dbl && R.grabUsed) return null;
+  const hx = R.x + 10, hy = R.y + 90; let best = null, bd = GRAB_RANGE;
+  for (const a of anchors) {
+    if (R.grap && R.grap.a === a) continue;
+    const dx = a.x - hx, dy = a.y - hy, d = Math.hypot(dx, dy);
+    if (dx > 20 && dy > 40 && d < bd) { best = a; bd = d; }
+  }
+  return best;
+}
+function tryGrab() {
+  const a = R.gTarget; if (!a) return;
+  R.trick = null; R.gliding = false;
+  R.shot = { a, t: 0, arm: R.grap ? 1 - R.grap.arm : 0 }; R.grabUsed = true;
+}
+function attachGrapple() {
+  const sh = R.shot, a = sh.a; R.shot = null;
+  let hx, hy, vx, vy;
+  if (R.grap && R.grap.kind === 'swing') {             // chaining: carry the swing's speed over to the new ring
+    const gp = R.grap, Lb = gp.L + 50; hx = gp.hand[0]; hy = gp.hand[1]; vx = Lb * gp.om * Math.cos(gp.ph); vy = Lb * gp.om * Math.sin(gp.ph);
+  } else { const hw = R.handW && R.handW[sh.arm]; hx = hw ? hw[0] : R.x + 10; hy = hw ? hw[1] : R.y + 90; vx = R.vx; vy = R.ground ? 0 : R.vy; }
+  if (R.mode !== 'air') enterAir();
+  R.ground = false; R.coyote = 0; R.jumpBuf = 0; R.trick = null; R.touch = R.roll = R.xf = null; R.vault = null;
+  if (a.kind === 'swing') {
+    const L = Math.max(90, Math.hypot(hx - a.x, hy - a.y)), ph = Math.atan2(hx - a.x, a.y - hy);
+    R.grap = { a, kind: 'swing', L, ph, om: (vx * Math.cos(ph) + vy * Math.sin(ph)) / (L + 50), arm: sh.arm, t: 0, hand: [hx, hy] };
+  } else R.grap = { a, kind: 'pull', hand: [hx, hy], arm: sh.arm, t: 0 };
+  R.joyT = 0.6;
+}
+// hanging on: swinging under a crane ring, or being reeled up to a wall ring
+function hangUpdate(dt) {
+  if (R.vault) {                                       // up and over the top of the wall
+    const v = R.vault; v.t += dt; const k = ease(v.t / 0.3);
+    R.x = lerp(v.x0, v.x1, k); R.y = lerp(v.y0, v.y1, k) + Math.sin(Math.PI * k) * 18;
+    if (v.t >= 0.3) { R.vault = null; R.x = v.x1; R.y = v.y1; R.ground = true; R.lastGround = R.y; R.vx = cam.v; land(20); }
+    return;
+  }
+  const gp = R.grap, a = gp.a; gp.t += dt;
+  if (R.jumpBuf > 0 && gp.t > 0.08) { R.jumpBuf = 0; releaseGrapple(true); return; }   // jump lets go early
+  if (gp.kind === 'swing') {
+    if (gp.L > ROPE_MAX) gp.L = Math.max(ROPE_MAX, gp.L - 600 * dt);                  // reel in to a good swing length
+    const Lb = gp.L + 50;
+    gp.om += -(G / Lb) * Math.sin(gp.ph) * dt;
+    if (gp.ph < REL_A) gp.om = Math.max(gp.om, Math.sqrt(Math.max(0, 2 * G / Lb * (Math.cos(gp.ph) - Math.cos(REL_A + 0.2)))));   // always enough swing to reach the far side
+    gp.ph += gp.om * dt;
+    const sn = Math.sin(gp.ph), cs = Math.cos(gp.ph);
+    gp.hand = [a.x + gp.L * sn, a.y - gp.L * cs];
+    const nx = gp.hand[0] + 100 * sn, ny = gp.hand[1] - 100 * cs;                    // his feet hang on past his hand, along the line
+    R.vx = Lb * gp.om * cs; R.vy = Lb * gp.om * sn;
+    let bonk = false; segsIn(Math.min(R.x, nx) - HW, Math.max(R.x, nx) + HW, sg => { if (sg.h !== null && sg.h > ny + STEP && sg.x0 > R.x && nx + HW > sg.x0) bonk = true; });
+    R.x = nx; R.y = ny; R.apexY = R.y;
+    if (bonk) { R.x = Math.min(R.x, R.x); releaseGrapple(false); R.vx = 0; return; }
+    const sp = support(R.x, R.y + STEP);
+    if (sp !== null && R.y <= sp && R.vy <= 0) { R.y = sp; R.grap = null; R.ground = true; R.lastGround = sp; land(20); return; }
+    if (gp.ph >= REL_A && gp.om > 0) releaseGrapple(false);
+  } else {                                             // reel in towards the ring, hanging against the wall
+    const dx = a.x - gp.hand[0], dy = a.y - gp.hand[1], dl = Math.hypot(dx, dy), st = Math.min(dl, 1000 * dt);
+    gp.hand = [gp.hand[0] + dx / dl * st, gp.hand[1] + dy / dl * st];
+    R.x = Math.min(gp.hand[0] - 4, a.wx - HW); R.y = gp.hand[1] - 100; R.vx = 0; R.vy = 0; R.apexY = R.y;
+    if (dl < 30) {                                     // the reel's momentum flings him on up past the ring and over the top
+      R.grap = null; R.vx = cam.v * 0.85; R.vy = 860;
+      R.mode = 'air'; R.airT = 0.2; R.apexY = R.y; R.takeY = R.y; R.cut = true; R.sJump = true; R.jumps = 0; R.glideT = 0; R.pT = null;
+      rings.push({ x: R.x + 6, y: R.y + 40, t: 0 }); pop('hup!', true); R.joyT = 1;
+    }
+  }
+}
+function releaseGrapple(byJump) {
+  const gp = R.grap; R.grap = null;
+  if (gp.kind === 'swing') { R.vx = Math.min(R.vx * 1.08, cam.v + 200); R.vy *= 1.08; } else { R.vx = cam.v; R.vy = 0; }
+  if (byJump) R.vy = Math.max(R.vy, 0) + 300;
+  R.mode = 'air'; R.airT = 0.2; R.apexY = R.y; R.takeY = R.y; R.cut = true; R.sJump = true; R.jumps = 0; R.glideT = 0; R.pT = null;
+  if (byJump || gp.kind === 'swing') pop(byJump ? 'hup!' : 'whee!', true);
+}
 function enterAir() {
   R.crash = null; R.sJump = false; R.takeY = R.y; R.jumps = 0; R.glideT = 0;
   R.mode = 'air'; R.airT = 0; R.pT = null; R.pred = null; R.airAmt = 0; R.ap = 0.3;
@@ -997,6 +1162,8 @@ function enterAir() {
   if (R.touch && R.lastRig) { R.xf = { rig: R.lastRig, t: 0 }; R.touch = null; }   // springing off out of a landing
 }
 function land(fall) {
+  R.grabUsed = false; R.grap = null; R.shot = null;
+  if (R.glideT > 0.8) R.joyT = 1;                    // a long float: happy landing
   R.mode = 'run'; R.pred = null; R.pT = null; R.jumps = 0; R.glideT = 0; R.gliding = false;
   if (R.trick) {                                       // landed it, or came down too soon and tumbled
     const tr = R.trick.tr, done = R.trick.t / tr.dur; R.trick = null;
@@ -1005,7 +1172,7 @@ function land(fall) {
       R.crash = { t: 0, ang: ((tr.front ? 1 : tr.pitch) * TAU * spin) % TAU }; R.touch = R.roll = R.xf = null;
       puff(R.x + 6, R.y, 6); pop('Ouch!'); return;
     }
-    R.trickPts += tr.pts; pop(`${tr.name}! +${tr.pts}`);
+    R.trickPts += tr.pts; pop(`${tr.name}! +${tr.pts}`); R.joyT = 1.1;
   }
   const leg = landingLeg(R.p);
   if (fall >= FALL_LARGE) { startRoll(); puff(R.x + 10, R.y, 6); return; }
@@ -1075,7 +1242,13 @@ function addScoreTo(n) {
 window.addEventListener('pagehide', () => { if (R && state === 'play') saveBest(); });
 
 // ---------- Drawing ----------
-function figureFor(Rn) {
+function figureFor(Rn) { const F = figureFor0(Rn);
+  if (Rn.shot && !F.hipW) { const B = F.B1, ai = Rn.shot.arm, sh = B.arms[ai][0], to = [Rn.shot.a.x - Rn.x, -(Rn.shot.a.y - Rn.y - F.hipUp)];
+    const ang = Math.atan2(to[0] - sh[0], to[1] - sh[1]), u = [Math.sin(ang), Math.cos(ang)];
+    const e = [sh[0] + u[0] * L.uarm, sh[1] + u[1] * L.uarm]; B.arms[ai] = [sh, e, [e[0] + u[0] * L.farm, e[1] + u[1] * L.farm]]; }
+  return F;
+}
+function figureFor0(Rn) {
   if (Rn.mode === 'squish') {
     const B0 = bones(SPLAT), all = [B0.head, ...B0.legs.flat(), ...B0.arms.flat()];
     const piv = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length];
@@ -1084,6 +1257,16 @@ function figureFor(Rn) {
   }
   let face = 'happy', rig;
   const run = runRig(Rn.p, Rn.va);
+  if (Rn.grap && Rn.mode !== 'dead-fall') {             // hanging from the line: body along it, gripper arm reaching to the ring
+    const gp = Rn.grap, hx = gp.hand[0], hy = gp.hand[1], dx = gp.a.x - hx, dy = -(gp.a.y - hy), dl = Math.hypot(dx, dy) || 1;
+    const arm = Math.atan2(dx, dy) / D, lean = clamp(Math.atan2(dx / dl, -dy / dl) / D, -60, 60), sl = Math.sin(lean * D), cl = Math.cos(lean * D);
+    const tuck = gp.kind === 'pull' ? 0.6 : 0.25 + 0.25 * Math.sin((gp.ph || 0) * 2);
+    const other = gp.kind === 'pull' ? [arm - 18, arm - 30] : [-40 + lean, -10 + lean], arms = gp.arm ? [other, [arm, arm - 6]] : [[arm, arm - 6], other];
+    const r = { H: 46, lean, nod: lean * 0.3, feet: [[-sl * 38 + 6 + 10 * tuck, 46 - cl * 38 + 14 * tuck], [-sl * 40 - 4, 46 - cl * 40 + 4]], arms };
+    Rn.lastRig = r; const B1 = bones(rigToPose(r)), hb = B1.arms[gp.arm][2];
+    return { B1, hipUp: r.H, face: 'joy', hipW: [hx - hb[0], hy + hb[1]] };
+  }
+  if (Rn.vault) { const r = lerpRig(prepRig(), run, ease(Rn.vault.t / 0.3)); Rn.lastRig = r; return { B1: bones(rigToPose(r)), hipUp: r.H, face: 'joy' }; }
   if (Rn.crash && Rn.mode === 'run') { Rn.lastRig = run; return crashFigure(run, Rn.crash.t, Rn.crash.ang); }
   if (Rn.mode === 'air' || Rn.mode === 'dead-fall') {
     const dead = Rn.mode === 'dead-fall', pr = Rn.pred;
@@ -1102,7 +1285,7 @@ function figureFor(Rn) {
       else if (pr.fall >= FALL_MEDIUM) { const lg = landingLeg(Rn.pT || Rn.p); to = { ...run, feet: run.feet.map((f, i) => i === lg ? [f[0] + REACH_X, f[1]] : f) }; }
       rig = lerpRig(rig, to, ease(1 - pr.t / PRE_T), 'keep');
     }
-    if (dead) face = 'oops';
+    if (dead) face = 'scared';
     if (Rn.trick && !dead) { Rn.lastRig = rig; const F = trickFigure(rig, Rn.trick.tr, Rn.trick.t); return { B1: F.B1, hipUp: F.hipUp, face }; }
   } else rig = run;
   if (Rn.xf) rig = lerpRig(Rn.xf.rig, rig, ease(Rn.xf.t / 0.12), 'fwd');
@@ -1237,14 +1420,63 @@ function render() {
     g.stroke(); g.restore();
     g.lineWidth = lw; g.beginPath(); g.moveTo(X0, yb); g.lineTo(X0, yt); g.lineTo(X1, yt); g.lineTo(X1, yb); g.stroke();
   });
+  // cranes and grapple rings
+  cranes.forEach(c => {
+    if (c.jx1 < cam.x - 60 || c.jx0 > cam.x + vw + 60) return;
+    g.save(); g.strokeStyle = INK; g.lineWidth = Math.max(1.4, 3 * s);
+    g.beginPath(); g.moveTo(SX(c.mx - 14), SY(c.base)); g.lineTo(SX(c.mx - 14), SY(c.top)); g.moveTo(SX(c.mx + 14), SY(c.base)); g.lineTo(SX(c.mx + 14), SY(c.top));
+    g.moveTo(SX(c.jx0), SY(c.top)); g.lineTo(SX(c.jx1), SY(c.top)); g.moveTo(SX(c.jx0), SY(c.top + 22)); g.lineTo(SX(c.jx1), SY(c.top + 8)); g.lineTo(SX(c.jx1), SY(c.top)); g.stroke();
+    g.lineWidth = Math.max(1, 1.7 * s); g.beginPath();
+    for (let y = c.base; y < c.top - 20; y += 34) { g.moveTo(SX(c.mx - 14), SY(y)); g.lineTo(SX(c.mx + 14), SY(y + 34)); g.moveTo(SX(c.mx - 14), SY(y + 34)); g.lineTo(SX(c.mx + 14), SY(y + 34)); }
+    for (let x = c.jx0; x < c.jx1 - 10; x += 36) { const t = (y => SY(c.top + 22 - (y - c.jx0) * 14 / (c.jx1 - c.jx0))); g.moveTo(SX(x), SY(c.top)); g.lineTo(SX(x + 18), t(x + 18)); g.lineTo(SX(Math.min(x + 36, c.jx1)), SY(c.top)); }
+    g.moveTo(SX(c.mx), SY(c.top + 22)); g.lineTo(SX(c.mx), SY(c.top + 70)); g.lineTo(SX(c.jx0), SY(c.top + 22)); g.moveTo(SX(c.mx), SY(c.top + 70)); g.lineTo(SX(c.jx1), SY(c.top + 8));
+    c.lines.forEach(x => { g.moveTo(SX(x), SY(c.top)); g.lineTo(SX(x), SY(c.ay + 10)); });
+    g.stroke();
+    g.fillStyle = '#fff'; g.lineWidth = Math.max(1.4, 2.4 * s); g.beginPath(); g.rect(SX(c.mx + 14), SY(c.top - 8), 30 * s, 30 * s); g.fill(); g.stroke();
+    g.beginPath(); g.rect(SX(c.jx0 + 2), SY(c.top + 4), 40 * s, 30 * s); g.fill(); g.stroke();
+    g.restore();
+  });
+  anchors.forEach(a => {
+    if (a.x < cam.x - 60 || a.x > cam.x + vw + 60) return;
+    const x = SX(a.x), y = SY(a.y);
+    g.save(); g.strokeStyle = INK; g.lineWidth = Math.max(1.6, 3.2 * s);
+    if (a.kind === 'pull') { g.beginPath(); g.moveTo(x, SY(a.top)); g.lineTo(x, y + 9 * s); g.stroke(); }
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(x, y, 9 * s, 0, TAU); g.fill(); g.stroke();
+    if (R.gTarget === a && state === 'play') {           // ping! it's in reach
+      const pt = time % 0.7;
+      for (let i = 0; i < 2; i++) { const q = ((pt + i * 0.35) % 0.7) / 0.7; g.globalAlpha = 1 - q; g.lineWidth = 2; g.beginPath(); g.arc(x, y, (14 + 40 * q) * Math.max(0.7, s), 0, TAU); g.stroke(); }
+      g.globalAlpha = 1; g.lineWidth = 2; g.beginPath();
+      for (const an of [-0.6, -1.57, -2.5]) { g.moveTo(x + Math.cos(an) * 24, y + Math.sin(an) * 24); g.lineTo(x + Math.cos(an) * 32, y + Math.sin(an) * 32); }
+      g.stroke(); g.fillStyle = INK; g.font = `700 22px ${FONT}`; g.textAlign = 'center'; g.fillText('ping!', x, y - 42);
+    }
+    g.restore();
+  });
   // dust puffs
   g.lineWidth = Math.max(1.5, 2.2 * s);
   puffs.forEach(p => { g.globalAlpha = clamp(p.life / p.max, 0, 1); g.beginPath(); g.arc(SX(p.x), SY(p.y), p.r * s * (1.6 - p.life / p.max), 0, TAU); g.stroke(); });
   g.globalAlpha = 1;
   // runner
-  const { B1, hipUp, face } = figureFor(R);
-  const hx = SX(R.x), hy = SY(R.y + hipUp);
-  const gear = { ...gearFor(R.got), flap: Math.max(0, 1 - R.kickT / 0.2), glide: R.glideW, t: time, speed: R.va };
+  const fig = figureFor(R), { B1, hipUp } = fig;
+  let face = fig.face;
+  if (face === 'happy' && state === 'play') {         // scared near the left edge, joyful after a trick or during a long float
+    const rel = (R.x - cam.x) / vw;
+    if (R.grap || R.vault) face = 'joy';
+    else if (rel < 0.16) face = 'scared';
+    else if (R.joyT > 0 || (R.gliding && R.glideT > 0.6)) face = 'joy';
+  }
+  const hx = fig.hipW ? SX(fig.hipW[0]) : SX(R.x), hy = fig.hipW ? SY(fig.hipW[1]) : SY(R.y + hipUp);
+  const gear = { ...gearFor(R.got), flap: Math.max(0, 1 - R.kickT / 0.2), glide: R.glideW, t: time, speed: R.va,
+    fired: R.grap ? R.grap.arm : R.shot ? R.shot.arm : -1 };
+  // the grapple line: flying out to the ring, or holding on
+  R.handW = B1.arms.map(a => [cam.x + (hx + a[2][0] * s) / s, cam.gy + (base - (hy + a[2][1] * s)) / s]);
+  const ln = R.grap || R.shot;
+  if (ln && state === 'play') {
+    const hp = B1.arms[ln.arm][2], lx = hx + hp[0] * s, ly = hy + hp[1] * s, ax = SX(ln.a.x), ay = SY(ln.a.y), k = R.shot ? ease(R.shot.t / 0.12) : 1;
+    const ex = lerp(lx, ax, k), ey = lerp(ly, ay, k);
+    g.save(); g.strokeStyle = INK; g.lineWidth = Math.max(1.2, 1.8 * s); g.beginPath(); g.moveTo(lx, ly);
+    if (R.shot) g.quadraticCurveTo((lx + ex) / 2, (ly + ey) / 2 + 12 * (1 - k), ex, ey); else g.lineTo(ex, ey);
+    g.stroke(); drawHook(g, ex, ey, Math.atan2(ey - ly, ex - lx) + Math.PI / 2, s); g.restore();
+  }
   g.save(); g.lineWidth = Math.max(1.5, 2 * s);
   rings.forEach(r => { const q = r.t / 0.35; g.globalAlpha = 1 - q; g.beginPath(); g.ellipse(SX(r.x), SY(r.y) + 4 * s, (14 + 30 * q) * s, (4 + 6 * q) * s, 0, 0, TAU);
     g.moveTo(SX(r.x) - (20 + 22 * q) * s, SY(r.y) + 12 * s); g.lineTo(SX(r.x) - (30 + 30 * q) * s, SY(r.y) + 17 * s);
@@ -1256,7 +1488,7 @@ function render() {
     g.save(); g.globalAlpha = a; g.fillStyle = p.small ? '#777' : INK; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.font = `700 ${p.small ? 20 : (W < 500 ? 26 : 32)}px ${FONT}`; g.fillText(p.text, x, Math.max(SAFE.t + 110, SY(p.y + 140)) - p.t * 30); g.restore();
   });
-  if (state === 'play' || state === 'dying' || state === 'pick') drawHUD();
+  if (state === 'play' || state === 'dying' || state === 'pick' || state === 'count') drawHUD();
 }
 function drawClouds(g, s, base) {
   g.save(); g.strokeStyle = '#c8c8c8'; g.lineWidth = Math.max(1.5, 2.4 * s);
@@ -1292,8 +1524,16 @@ function drawHUD() {
     g.font = `700 ${small ? 26 : 32}px ${FONT}`; g.fillText(t.text, W / 2, T + (small ? 92 : 70) - (1 - a) * 10);
     g.globalAlpha = 1;
   }
+  if (state === 'count') {                            // the big 3, 2, 1
+    const n = Math.ceil(countT / (COUNT_T / 3)), k = 1 - (countT % (COUNT_T / 3)) / (COUNT_T / 3);   // k: 0 → 1 through each number
+    g.save(); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillStyle = INK;
+    g.globalAlpha = Math.min(1, (1 - k) / 0.25 + 0.15); g.font = `700 ${Math.round((small ? 96 : 140) * (1.25 - 0.25 * ease(k * 3)))}px ${FONT}`;
+    g.fillText(String(Math.max(1, n)), W / 2, H * 0.4);
+    g.globalAlpha = 1; g.font = `700 ${small ? 22 : 26}px ${FONT}`; g.fillText('get ready!', W / 2, H * 0.4 + (small ? 70 : 96));
+    g.restore();
+  }
   // touch pads (phones): left half sprints, right half jumps
-  if (touch && state === 'play') {
+  if (touch && (state === 'play' || state === 'count')) {
     const ph = Math.min(64, H * 0.12), pw = Math.min(150, W * 0.36), py = H - SAFE.b - ph - 40;   // above the title at the bottom
     const padAt = (x, label, on) => {
       g.save(); g.setLineDash([7, 7]); g.lineWidth = 2.5; g.strokeStyle = on ? INK : '#9a9a9a';
@@ -1303,10 +1543,18 @@ function drawHUD() {
     };
     const trickNow = R.got.includes('trick') && trickReady();   // in the air with room for a trick: sprint becomes trick
     padAt(SAFE.l + 14, trickNow ? 'trick!' : 'sprint', input.sprint || trickNow); padAt(W - SAFE.r - 14 - pw, 'jump', input.jump);
+    if (R.gTarget && state === 'play') {                // grab! pops up above sprint, pinging, while a ring is in reach
+      const gy0 = grabPadY(), q = (time % 0.7) / 0.7;
+      g.save(); g.setLineDash([7, 7]); g.lineWidth = 2.5; g.strokeStyle = INK; rrect(g, SAFE.l + 14, gy0, pw, ph, 16); g.fillStyle = '#ececec'; g.fill(); g.stroke();
+      g.setLineDash([]); g.globalAlpha = (1 - q) * 0.8; g.lineWidth = 2; rrect(g, SAFE.l + 14 - 6 * q, gy0 - 6 * q, pw + 12 * q, ph + 12 * q, 18); g.stroke(); g.restore();
+      g.fillStyle = INK; g.font = `700 ${small ? 22 : 26}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('grab!', SAFE.l + 14 + pw / 2, gy0 + ph / 2 + 2);
+    }
   }
   g.restore();
 }
 
+
+const grabPadY = () => H - SAFE.b - Math.min(64, H * 0.12) * 2 - 40 - 14;
 
 // ---------- Overlay art ----------
 function mini(canvas, fn) {
@@ -1363,24 +1611,31 @@ function drawQuestion(cvs) {
 }
 
 // ---------- Skill Card picker ----------
-let cardShown = [];
+let cardShown = [], cardOpenAt = 0;
+const CARD_WAIT = 0.8;                                // seconds before the card can be taken, so a tap or key meant for the run can't close it
 function offerCards(list, at) {
-  state = 'pick'; clearInput(); cardShown = list;
+  state = 'pick'; clearInput(); cardShown = list; cardOpenAt = time;
+  $('takeBtn').disabled = true; $('cardOv').classList.add('wait');
+  setTimeout(() => { if (state === 'pick') { $('takeBtn').disabled = false; $('cardOv').classList.remove('wait'); } }, CARD_WAIT * 1000);
   $('cardMsg').textContent = list.length > 1 ? `You ran ${at} m! Pick a Skill Card:` : `You ran ${at} m! Here's a new Skill Card:`;
-  $('cardNote').textContent = touch ? 'tap the card to take it' : 'click the card (or press 1, 2, 3 or Enter)';
+  $('cardNote').textContent = touch ? '' : 'or press Enter';
   const box = $('cardList'); box.innerHTML = ''; box.classList.toggle('few', list.length < 3);
   list.forEach(c => {
     const b = document.createElement('button'); b.className = 'mut';
-    b.innerHTML = `<canvas width="320" height="240"></canvas><i>${c.tag}</i><b>${c.name}</b><p>${c.desc}</p>`;
+    b.innerHTML = `<canvas width="320" height="240"></canvas><i>${c.tag}</i><b${c.name.length > 16 ? ' class="long"' : ''}>${c.name}</b><p>${c.desc}</p>`;
     b.onclick = () => takeCard(c); box.appendChild(b); c.cvs = b.querySelector('canvas');
   });
   show('cardOv', true); $('cardOv').querySelector('.card').scrollTop = 0;
 }
 function takeCard(c) {
-  if (state !== 'pick') return;
-  R.got.push(c.id); show('cardOv', false); clearInput(); state = 'play';
-  toast(c.name + '!');
+  if (state !== 'pick' || time - cardOpenAt < CARD_WAIT) return;
+  R.got.push(c.id); show('cardOv', false); clearInput();
+  state = 'count'; countT = COUNT_T; R.cardName = c.name;     // 3, 2, 1... then off you go
 }
+$('takeBtn').addEventListener('keydown', e => { if (e.code === 'Space') e.preventDefault(); });
+$('takeBtn').onclick = () => { if (cardShown[0]) takeCard(cardShown[0]); };
+const COUNT_T = 2.4;                                  // 3, 2, 1: 0.8 s each
+let countT = 0;
 // the little demo on each card: he runs, jumps and does the card's trick
 function cardArt(c) {
   mini(c.cvs, g => {
@@ -1403,6 +1658,19 @@ function cardArt(c) {
       h *= sq / 0.28;
       const base = h > 0 ? lerpRig(runRig(time * 2.6, v), airRig(time * 1.8, v), 0.8, 'keep') : runRig(time * 2.6, v);
       fig = { B1: bones(rigToPose(base)), hipUp: base.H };
+    } else if (c.demo === 'grip' || c.demo === 'grip2') {     // swinging under a crane jib (both arms in turn with the Super Double)
+      g.lineWidth = 2.4; g.beginPath(); g.moveTo(10, 14); g.lineTo(150, 14); g.moveTo(10, 22); g.lineTo(150, 18); g.stroke();
+      g.lineWidth = 1.2; g.beginPath(); for (let x = 10; x < 145; x += 14) { g.moveTo(x, 14); g.lineTo(x + 7, 21 - (x - 10) * 0.03); g.lineTo(x + 14, 14); } g.stroke();
+      const sw = Math.sin(time * 2.4), ph = 0.75 * sw, two = c.demo === 'grip2', ax = two ? (Math.cos(time * 2.4) > 0 ? 58 : 102) : 80, ay = 30, Lr = 58;
+      const hx = ax + Lr * Math.sin(ph), hy = ay + Lr * Math.cos(ph);
+      g.lineWidth = 1.4; g.beginPath(); (two ? [58, 102] : [80]).forEach(x => { g.moveTo(x, 18); g.lineTo(x, ay - 4); }); g.stroke();
+      g.lineWidth = 2; (two ? [58, 102] : [80]).forEach(x => { g.beginPath(); g.arc(x, ay, 4, 0, TAU); g.fillStyle = '#fff'; g.fill(); g.stroke(); });
+      g.lineWidth = 1.2; g.beginPath(); g.moveTo(ax, ay + 3); g.lineTo(hx, hy); g.stroke();
+      const lean = -ph / D * 0.9, sl = Math.sin(lean * D), cl = Math.cos(lean * D), arm = 180 + ph / D;
+      const rig = { H: 46, lean, nod: lean * 0.3, feet: [[-sl * 38 + 8, 46 - cl * 38 + 8], [-sl * 40 - 4, 46 - cl * 40 + 4]], arms: [[arm, arm - 6], [-40 + lean, -10 + lean]] };
+      const B = bones(rigToPose(rig)), hb = B.arms[0][2], kk = 0.5;
+      g.save(); g.translate(hx - hb[0] * kk, hy - hb[1] * kk); g.scale(kk, kk); drawRunner(g, B, 'joy'); drawGear(g, B, { ...gear, fired: 0 }); g.restore();
+      return;
     } else if (c.demo === 'cape' || c.demo === 'cape2') {      // jump, then open the cape and float down slowly
       const up = 0.31, gv = c.demo === 'cape2' ? 55 : 80;
       h = t < up ? 620 * t - 1000 * t * t : Math.max(0, (620 * up - 1000 * up * up) - gv * (t - up));
@@ -1426,14 +1694,14 @@ function startRun() { show('startOv', false); show('brand', true); show('restart
 function toMainMenu() {
   if (state === 'play') saveBest();
   state = 'start'; clearInput();
-  show('deadOv', false); show('cardOv', false); show('brand', false); show('restartBtn', false);
+  show('deadOv', false); show('cardOv', false); show('brand', false); show('restartBtn', false); countT = 0;
   closeEntry(); resetGame(); refreshBoard(diffKey, true); showBestLine(); show('startOv', true);
 }
 function die(cause) {
   if (state !== 'play') return;
   R.gliding = false; R.glideW = 0;
   state = 'dying'; deathCause = cause; deathT = 0; clearInput();
-  R.touch = R.roll = R.xf = R.trick = R.crash = null;
+  R.touch = R.roll = R.xf = R.trick = R.crash = R.grap = R.shot = R.vault = null;
   if (cause === 'squish') { R.mode = 'squish'; R.x = cam.x + HW * 0.45 + 2; puff(R.x, R.y + 40, 5); }
   else { R.mode = 'dead-fall'; R.pred = null; }
   saveBest();
@@ -1611,10 +1879,12 @@ function syncPtrs() {
   input.jump = keyJ.size > 0 || [...ptrs.values()].includes('jump');
 }
 const keyJ = new Set(), keyS = new Set();
-function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); input.jump = input.sprint = input.jumpPressed = input.trickPressed = false; }
+function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); input.grabPressed = false; input.jump = input.sprint = input.jumpPressed = input.trickPressed = false; }
 const sprintTap = () => { if (R && !R.ground) input.trickPressed = true; };   // sprint pressed in the air = a trick (if you have the card)
 cv.addEventListener('pointerdown', e => {
   if (state !== 'play') return;
+  const gy0 = grabPadY(), onGrab = R.gTarget && e.clientX < W / 2 && e.clientY >= gy0 - 26 && e.clientY < gy0 + Math.min(64, H * 0.12) + 7;
+  if (onGrab) { input.grabPressed = true; e.preventDefault(); return; }   // the grab! pad (only there while a ring is in reach)
   const role = e.clientX < W / 2 ? 'sprint' : 'jump';
   ptrs.set(e.pointerId, role); if (role === 'jump') input.jumpPressed = true; else sprintTap();
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
@@ -1623,11 +1893,16 @@ cv.addEventListener('pointerdown', e => {
 const endPtr = e => { ptrs.delete(e.pointerId); syncPtrs(); };
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('contextmenu', e => e.preventDefault());
-const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'], SPRINT_KEYS = ['ShiftLeft', 'ShiftRight', 'ArrowRight', 'KeyD'];
+const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'], SPRINT_KEYS = ['ShiftLeft', 'ShiftRight', 'ArrowRight', 'KeyD'], GRAB_KEYS = ['KeyE', 'KeyS', 'ArrowDown'];
 window.addEventListener('keydown', e => {
-  if (state === 'pick') {                             // the card picker: 1, 2, 3 pick a card; Enter / Space takes the first
-    const n = { Digit1:0, Digit2:1, Digit3:2, Numpad1:0, Numpad2:1, Numpad3:2, Enter:0, Space:0 }[e.code];
+  if (state === 'pick') {                             // the card picker: Enter takes it (1, 2, 3 if there's a choice). Not Space or the run keys.
+    const n = { Digit1:0, Digit2:1, Digit3:2, Numpad1:0, Numpad2:1, Numpad3:2, Enter:0, NumpadEnter:0 }[e.code];
     if (n !== undefined && cardShown[n]) { e.preventDefault(); takeCard(cardShown[n]); }
+    if (JUMP_KEYS.includes(e.code) || SPRINT_KEYS.includes(e.code)) e.preventDefault();   // the run keys do nothing here (no page scroll, no button press)
+    return;
+  }
+  if (state === 'count') {                            // counting down: keys wait for the run
+    if (JUMP_KEYS.includes(e.code) || SPRINT_KEYS.includes(e.code) || e.code === 'Enter') e.preventDefault();
     return;
   }
   if (e.code === 'Enter' || (e.code === 'Space' && state !== 'play')) {
@@ -1637,6 +1912,7 @@ window.addEventListener('keydown', e => {
   if (state !== 'play') return;
   if (JUMP_KEYS.includes(e.code)) { if (!e.repeat) input.jumpPressed = true; keyJ.add(e.code); e.preventDefault(); }
   if (SPRINT_KEYS.includes(e.code)) { if (!e.repeat) sprintTap(); keyS.add(e.code); e.preventDefault(); }
+  if (GRAB_KEYS.includes(e.code)) { if (!e.repeat) input.grabPressed = true; e.preventDefault(); }
   syncPtrs();
 });
 window.addEventListener('keyup', e => { keyJ.delete(e.code); keyS.delete(e.code); syncPtrs(); });
