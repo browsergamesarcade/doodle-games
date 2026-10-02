@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Runner Game v6.1</title>
+<title>Doodle Runner Game v7.0</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -179,10 +179,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v6.1</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v7.0</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Runner Game</h1><div class="ver">v6.1</div>
+  <h1>Doodle Runner Game</h1><div class="ver">v7.0</div>
   <canvas id="startArt" width="400" height="220"></canvas>
   <p>Run, run, run across the rooftops!<br>Leap the gaps and hop the AC units.<br>How far can you go?</p>
   <div class="diffs" id="diffs">
@@ -219,7 +219,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <h3>Watch out!</h3>
   <p>Fall down a gap between buildings and it's game over. Bump into a wall or a rooftop thing and you'll stop, so jump it quickly before the screen squishes you against the edge!</p>
   <h3>Skill Cards</h3>
-  <p>Run far enough and you'll find a <b>Skill Card</b>! There's a new one at <b>250, 600, 1000, 1500, 2100, 2800, 3600 and 4500 m</b>, each with a new move and a little bit of gear. Once you have a move, bigger gaps and walls start to turn up!</p>
+  <p>Run far enough and you'll find a <b>Skill Card</b>! There's a new one at <b>250, 600, 1000, 1500, 2100, 2800, 3600, 4500 and 5500 m</b>, each with a new move and a little bit of gear. Once you have a move, bigger gaps and walls start to turn up!</p>
   <h3>Tricks</h3>
   <p>With the <b>Trick</b> card (and its backwards cap!), press <b>sprint</b> again <b>in the air</b> to flip, spin or cartwheel. You need lots of air: a <b>sprint jump</b>, or a jump down onto a lower roof. Land it for bonus points! Leave it too late and you'll tumble, and it takes a second to get back up.</p>
   <h3>Double Jump</h3>
@@ -228,6 +228,8 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
   <p>With the <b>Floaty Cape</b>, <b>hold jump</b> while you're coming down to float gently over big gaps. Each jump gets about a second and a half of floating (more with the <b>Super Cape</b>).</p>
   <h3>Grapply Gripper</h3>
   <p>A grapple on your wrist! When a ring on a crane or on top of a tall wall goes <b>ping</b>, press <b>grab</b> to fire it. Crane rings swing you across big gaps (you let go at the top of the swing, or press <b>jump</b> to let go early). Wall rings pull you right up to the top. The <b>Super Double</b> one has a grapple on each arm, so you can grab the next ring while you swing!</p>
+  <h3>Glasses of Awesomeness</h3>
+  <p>So cool you can see further! With the shades on, the view zooms out a little so you can spot gaps and walls sooner.</p>
   <h3>Score</h3>
   <p>Every metre you run scores a point, and landed tricks score lots more. The screen slowly gets faster the further you go. Beat the <b>top 3</b> (or your own best) and pop in your 3 letters for the leaderboard!</p>
   <h3>Controls</h3>
@@ -286,7 +288,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <script>
 (() => {
 'use strict';
-const VERSION = '6.1';
+const VERSION = '7.0';
 const TAU = Math.PI * 2, D = Math.PI / 180;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -330,7 +332,9 @@ window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 150));
 resize();
 // world scale: show at least ~480 units of height and ~680 units of width (portrait phones see further ahead)
-const baseScale = () => Math.max(0.25, Math.min(H / 480, W / 680));   // never zero, even if the page starts with no size (e.g. a preview panel)
+let glassesK = 1;                                     // Glasses of Awesomeness: the whole view zooms out a little
+const GLASSES_ZOOM = 0.84;
+const baseScale = () => Math.max(0.25, Math.min(H / 480, W / 680) * glassesK);   // never zero, even if the page starts with no size (e.g. a preview panel)
 const scale = () => baseScale() * (cam && cam.z ? cam.z : 1);         // the camera zooms out a little for big drops
 const groundLine = () => H * (W < H ? 0.66 : 0.72);   // where the ground you're on sits on screen
 
@@ -686,6 +690,7 @@ function drawGear(g, B, gear, k = 1) {
   if (gear.wings) B.legs.forEach((leg, i) => drawSneaker(g, leg[1], leg[2], gear, i ? 0.85 : 1, k, B.front ? (i ? -1 : 1) : 0));
   if (gear.cap) drawCap(g, B, gear.cap, k);
   if (gear.grip) { drawGripper(g, B, 0, k, gear.fired === 0); if (gear.grip > 1) drawGripper(g, B, 1, k, gear.fired === 1); }
+  if (gear.glasses) drawGlasses(g, B, k);
   g.restore();
 }
 function drawCap(g, B, lvl, k) {                       // a baseball cap worn backwards
@@ -767,20 +772,45 @@ function drawCape(g, B, gear, k = 1) {
 }
 
 // ---- Skill Cards: which cards there are, when they turn up ----
-const CARD_AT = [250, 600, 1000, 1500, 2100, 2800, 3600, 4500];   // metres
-const CARDS = [                                       // given in this order, one at each stop (Kev, 1 Oct 2026)
+const CARD_AT = [250, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500];   // metres
+const CARDS = [                                       // given in this order, one at each stop (Kev, 2 Oct 2026: the Gripper before the Cape)
   { id:'trick', tag:'new', name:'Trick', desc:'Press sprint in the air to flip and spin! Needs a sprint jump or a drop. Land it for points!', demo:'trick' },
   { id:'djump', tag:'new', name:'Double Jump', desc:'Winged sneakers! Tap jump again in the air to jump once more.', demo:'djump' },
-  { id:'trick2', needs:'trick', tag:'upgrade', name:'Trick Pro', desc:'Doubles and corks! Bigger tricks for bigger points.', demo:'trick2' },
-  { id:'cape', tag:'new', name:'Floaty Cape', desc:'Hold jump while you come down to float slowly over big gaps!', demo:'cape' },
-  { id:'djump2', needs:'djump', tag:'upgrade', name:'Hermes Wings', desc:'Bigger wings: Triple Jump! Tap jump a third time in the air.', demo:'tjump' },
   { id:'grip', tag:'new', name:'Grapply Gripper', desc:'A grapple on your wrist! When a ring goes ping, press grab to swing over gaps or zip up tall walls.', demo:'grip' },
-  { id:'cape2', needs:'cape', tag:'upgrade', name:'Super Cape', desc:'A bigger cape with a little heart. Float slower, and for longer!', demo:'cape2' },
+  { id:'trick2', needs:'trick', tag:'upgrade', name:'Trick Pro', desc:'Doubles and corks! Bigger tricks for bigger points.', demo:'trick2' },
   { id:'grip2', needs:'grip', tag:'upgrade', name:'Super Double Grapply Gripper', desc:'One on each arm! Grab the next ring while you swing and chain them like a spider.', demo:'grip2' },
+  { id:'djump2', needs:'djump', tag:'upgrade', name:'Hermes Wings', desc:'Bigger wings: Triple Jump! Tap jump a third time in the air.', demo:'tjump' },
+  { id:'cape', tag:'new', name:'Floaty Cape', desc:'Hold jump while you come down to float slowly over big gaps!', demo:'cape' },
+  { id:'glasses', tag:'new', name:'Glasses of Awesomeness', desc:'So cool you can see further! The view zooms out a little so you spot what\'s coming.', demo:'glasses' },
+  { id:'cape2', needs:'cape', tag:'upgrade', name:'Super Cape', desc:'A bigger cape with a little heart. Float slower, and for longer!', demo:'cape2' },
 ];
 const gearFor = got => ({ cap: got.includes('trick2') ? 2 : got.includes('trick') ? 1 : 0,
   wings: got.includes('djump2') ? 2 : got.includes('djump') ? 1 : 0, cape: got.includes('cape2') ? 2 : got.includes('cape') ? 1 : 0,
-  grip: got.includes('grip2') ? 2 : got.includes('grip') ? 1 : 0 });
+  grip: got.includes('grip2') ? 2 : got.includes('grip') ? 1 : 0, glasses: got.includes('glasses') ? 1 : 0 });
+// Glasses of Awesomeness: chunky black shades with a little white shine. Drawn after the face, so they sit over his eyes.
+// Side-on: a big front lens, a smaller far lens, a bridge and an arm back to his ear. Facing you (B.front): two lenses.
+function drawGlasses(g, B, k = 1) {
+  const f = B.fwd, fl = Math.hypot(f[0], f[1]) || 1, fx = f[0] / fl, fy = f[1] / fl, ux = fy, uy = -fx;
+  const P = (a, b) => [B.head[0] + fx * a + ux * b, B.head[1] + fy * a + uy * b];
+  const lens = (cx, cy, w, h) => {                       // a rounded lens, filled ink, with a shine stroke
+    const pts = []; for (let i = 0; i < 20; i++) { const t = i / 20 * TAU, c = Math.cos(t), s = Math.sin(t);
+      const ex = Math.sign(c) * Math.pow(Math.abs(c), 0.6) * w / 2, ey = Math.sign(s) * Math.pow(Math.abs(s), 0.6) * h / 2; pts.push(P(cx + ex, cy + ey)); }
+    g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fillStyle = INK; g.fill();
+    g.lineWidth = 1.8 * k; g.strokeStyle = INK; g.stroke();
+    const [s1x, s1y] = P(cx - w * 0.22, cy + h * 0.18), [s2x, s2y] = P(cx + w * 0.02, cy - h * 0.12);
+    g.strokeStyle = '#fff'; g.lineWidth = 1.3 * k; g.beginPath(); g.moveTo(s1x, s1y); g.lineTo(s2x, s2y); g.stroke(); g.strokeStyle = INK;
+  };
+  g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+  if (B.front) { lens(3.9, 1.8, 6.6, 5.6); lens(-3.9, 1.8, 6.6, 5.6); g.lineWidth = 1.8 * k; g.beginPath(); const [a1, b1] = P(0.6, 2.4), [a2, b2] = P(-0.6, 2.4); g.moveTo(a1, b1); g.lineTo(a2, b2); g.stroke(); }
+  else {
+    g.lineWidth = 1.8 * k; g.beginPath(); const [ax, ay] = P(-3.6, 2.6), [bx, by] = P(-12.5, 3.6), [cx2, cy2] = P(-14.5, 1.2);   // the arm back to the ear
+    g.moveTo(ax, ay); g.lineTo(bx, by); g.lineTo(cx2, cy2); g.stroke();
+    const [q1x, q1y] = P(2.6, 2.6), [q2x, q2y] = P(3.6, 2.6); g.beginPath(); g.moveTo(q1x, q1y); g.lineTo(q2x, q2y); g.stroke();  // the bridge
+    lens(-0.8, 2.0, 5.6, 5.2); lens(7.6, 1.8, 7.4, 6.0);
+  }
+  g.restore();
+}
+
 // ---- Grapply Gripper ----
 const GRAB_RANGE = 420, ROPE_MAX = 190, REL_A = 0.75;   // reach to a ring, longest swing line, the swing angle where he lets go
 let anchors = [], cranes = [];                         // grapple rings, and the cranes they hang from
@@ -827,9 +857,10 @@ function resetGame() {
   addSeg(2000 + 900, 0);                   // a nice long flat start
   R = { x:0, y:0, vx:DIFF.v0, vy:0, ground:true, coyote:0, jumpBuf:0, cut:false, sprinting:false, stamina:STAMINA,
         apexY:0, mode:'run', p:0, ap:0, va:DIFF.v0, airT:0, spin:0, spinW:0, armNeed:0, airAmt:0, pT:null, pred:null, touch:null, roll:null, xf:null, lastRig:null,
-        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, rest:null, cardName:'', trick:null, crash:null, trickPts:0, takeY:0, sJump:false, airHold:false, jumps:0, glideT:0, glideW:0, gliding:false, kickT:9, grap:null, shot:null, vault:null, gTarget:null, grabUsed:false };
+        lastGround:0, score:0, newBest:false, dist:0, got:[], cardI:0, rest:null, cardName:'', trick:null, crash:null, trickPts:0, takeY:0, sJump:false, airHold:false, jumps:0, glideT:0, glideW:0, gliding:false, kickT:9, grabBuf:0, grap:null, shot:null, vault:null, gTarget:null, grabUsed:false };
   runT = 0; nextMilestone = 100; deathT = 0; deathCause = '';
   bestNow = bestAtStart = loadBest(diffKey);
+  glassesK = R.got.includes('glasses') ? GLASSES_ZOOM : 1; cam.x = R.x - W / baseScale() * HOME;
   gen();
 }
 function addSeg(len, h, obj) { segs.push({ x0:genX, x1:genX + len, h, obj }); genX += len; if (h !== null && !obj) genH = h; }
@@ -986,7 +1017,9 @@ function update(dt) {
 
   // the Grapply Gripper: which ring is in reach, firing, and hanging on
   R.gTarget = findAnchor();
-  if (input.grabPressed) { input.grabPressed = false; tryGrab(); }
+  if (input.grabPressed) { input.grabPressed = false; R.grabBuf = 0.3; }             // a grab press counts for a moment, so it's never early
+  R.grabBuf = (R.grabBuf || 0) - dt;
+  if (R.grabBuf > 0 && R.gTarget) { R.grabBuf = 0; tryGrab(); }
   if (R.shot) { R.shot.t += dt; if (R.shot.t >= 0.12) attachGrapple(); }
   const hanging = !!(R.grap || R.vault);
   if (hanging) hangUpdate(dt);
@@ -1544,17 +1577,18 @@ function drawHUD() {
     const trickNow = R.got.includes('trick') && trickReady();   // in the air with room for a trick: sprint becomes trick
     padAt(SAFE.l + 14, trickNow ? 'trick!' : 'sprint', input.sprint || trickNow); padAt(W - SAFE.r - 14 - pw, 'jump', input.jump);
     if (R.gTarget && state === 'play') {                // grab! pops up above sprint, pinging, while a ring is in reach
-      const gy0 = grabPadY(), q = (time % 0.7) / 0.7;
-      g.save(); g.setLineDash([7, 7]); g.lineWidth = 2.5; g.strokeStyle = INK; rrect(g, SAFE.l + 14, gy0, pw, ph, 16); g.fillStyle = '#ececec'; g.fill(); g.stroke();
-      g.setLineDash([]); g.globalAlpha = (1 - q) * 0.8; g.lineWidth = 2; rrect(g, SAFE.l + 14 - 6 * q, gy0 - 6 * q, pw + 12 * q, ph + 12 * q, 18); g.stroke(); g.restore();
-      g.fillStyle = INK; g.font = `700 ${small ? 22 : 26}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('grab!', SAFE.l + 14 + pw / 2, gy0 + ph / 2 + 2);
+      const gy0 = grabPadY(), q = (time % 0.7) / 0.7, gw = grabPadW(), gh = grabPadH();
+      g.save(); g.setLineDash([7, 7]); g.lineWidth = 3; g.strokeStyle = INK; rrect(g, SAFE.l + 14, gy0, gw, gh, 18); g.fillStyle = '#ececec'; g.fill(); g.stroke();
+      g.setLineDash([]); g.globalAlpha = (1 - q) * 0.8; g.lineWidth = 2; rrect(g, SAFE.l + 14 - 7 * q, gy0 - 7 * q, gw + 14 * q, gh + 14 * q, 20); g.stroke(); g.restore();
+      g.fillStyle = INK; g.font = `700 ${small ? 28 : 32}px ${FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('grab!', SAFE.l + 14 + gw / 2, gy0 + gh / 2 + 2);
     }
   }
   g.restore();
 }
 
 
-const grabPadY = () => H - SAFE.b - Math.min(64, H * 0.12) * 2 - 40 - 14;
+const grabPadH = () => Math.round(Math.min(64, H * 0.12) * 1.3), grabPadW = () => Math.min(200, W * 0.44);
+const grabPadY = () => H - SAFE.b - Math.min(64, H * 0.12) - 40 - 12 - grabPadH();   // just above the sprint pad
 
 // ---------- Overlay art ----------
 function mini(canvas, fn) {
@@ -1630,6 +1664,7 @@ function offerCards(list, at) {
 function takeCard(c) {
   if (state !== 'pick' || time - cardOpenAt < CARD_WAIT) return;
   R.got.push(c.id); show('cardOv', false); clearInput();
+  if (c.id === 'glasses') { const z0 = glassesK; glassesK = GLASSES_ZOOM; cam.x = R.x - (R.x - cam.x) * z0 / glassesK; }   // zoom out around the runner
   state = 'count'; countT = COUNT_T; R.cardName = c.name;     // 3, 2, 1... then off you go
 }
 $('takeBtn').addEventListener('keydown', e => { if (e.code === 'Space') e.preventDefault(); });
@@ -1658,6 +1693,13 @@ function cardArt(c) {
       h *= sq / 0.28;
       const base = h > 0 ? lerpRig(runRig(time * 2.6, v), airRig(time * 1.8, v), 0.8, 'keep') : runRig(time * 2.6, v);
       fig = { B1: bones(rigToPose(base)), hipUp: base.H };
+    } else if (c.demo === 'glasses') {
+      const base = runRig(time * 2.6, v); fig = { B1: bones(rigToPose(base)), hipUp: base.H };
+      const tw = (time * 1.4) % 1.6;
+      if (tw < 0.5) {                                    // ✦ a twinkle off the shades
+        const hd = fig.B1.head, x = 80 + (hd[0] + 9) * k, y = gy - fig.hipUp * k + (hd[1] - 2) * k, r = 6 * Math.sin(Math.PI * tw / 0.5);
+        g.lineWidth = 1.6; g.beginPath(); g.moveTo(x - r, y); g.lineTo(x + r, y); g.moveTo(x, y - r); g.lineTo(x, y + r); g.stroke();
+      }
     } else if (c.demo === 'grip' || c.demo === 'grip2') {     // swinging under a crane jib (both arms in turn with the Super Double)
       g.lineWidth = 2.4; g.beginPath(); g.moveTo(10, 14); g.lineTo(150, 14); g.moveTo(10, 22); g.lineTo(150, 18); g.stroke();
       g.lineWidth = 1.2; g.beginPath(); for (let x = 10; x < 145; x += 14) { g.moveTo(x, 14); g.lineTo(x + 7, 21 - (x - 10) * 0.03); g.lineTo(x + 14, 14); } g.stroke();
@@ -1883,8 +1925,10 @@ function clearInput() { ptrs.clear(); keyJ.clear(); keyS.clear(); input.grabPres
 const sprintTap = () => { if (R && !R.ground) input.trickPressed = true; };   // sprint pressed in the air = a trick (if you have the card)
 cv.addEventListener('pointerdown', e => {
   if (state !== 'play') return;
-  const gy0 = grabPadY(), onGrab = R.gTarget && e.clientX < W / 2 && e.clientY >= gy0 - 26 && e.clientY < gy0 + Math.min(64, H * 0.12) + 7;
-  if (onGrab) { input.grabPressed = true; e.preventDefault(); return; }   // the grab! pad (only there while a ring is in reach)
+  // the grab! pad: while a ring is in reach, the whole left side above the sprint pad grabs. A press up there just before
+  // a ring comes into reach is a sprint press too, but it's remembered for a moment and grabs as soon as the ring pings.
+  const upper = R.got.includes('grip') && e.clientX < W / 2 && e.clientY < H - SAFE.b - Math.min(64, H * 0.12) - 40 - 2;
+  if (upper) { input.grabPressed = true; if (R.gTarget) { e.preventDefault(); return; } }
   const role = e.clientX < W / 2 ? 'sprint' : 'jump';
   ptrs.set(e.pointerId, role); if (role === 'jump') input.jumpPressed = true; else sprintTap();
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
