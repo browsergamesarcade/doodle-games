@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Doodle Runner Game v7.0</title>
+<title>Doodle Runner Game v7.1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
@@ -179,10 +179,10 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <body>
 <canvas id="game"></canvas>
 <div id="safe"></div>
-<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v7.0</div></div>
+<div id="brand" class="hidden"><div class="t">Doodle Runner Game</div><div class="v">v7.1</div></div>
 
 <div class="overlay" id="startOv"><div class="card">
-  <h1>Doodle Runner Game</h1><div class="ver">v7.0</div>
+  <h1>Doodle Runner Game</h1><div class="ver">v7.1</div>
   <canvas id="startArt" width="400" height="220"></canvas>
   <p>Run, run, run across the rooftops!<br>Leap the gaps and hop the AC units.<br>How far can you go?</p>
   <div class="diffs" id="diffs">
@@ -288,7 +288,7 @@ canvas#game{position:fixed;inset:0;width:100%;height:100%;display:block;touch-ac
 <script>
 (() => {
 'use strict';
-const VERSION = '7.0';
+const VERSION = '7.1';
 const TAU = Math.PI * 2, D = Math.PI / 180;
 const FONT = "'Gaegu','Comic Sans MS',cursive";
 const INK = '#111';
@@ -1265,8 +1265,8 @@ function puff(x, y, n) { for (let i = 0; i < n; i++) puffs.push({ x, y:y + 4, vx
 function toast(text) { toasts.push({ text, life:2, max:2 }); }
 
 // ---------- Score & best ----------
-function loadBest(k) { try { return parseInt(localStorage.getItem('run1_best_' + k), 10) || 0; } catch (_) { return 0; } }
-function saveBest() { if (R.score >= bestNow && R.score > 0) try { localStorage.setItem('run1_best_' + diffKey, String(R.score)); } catch (_) {} }
+function loadBest(k) { try { return parseInt(localStorage.getItem('run2_best_' + k), 10) || 0; } catch (_) { return 0; } }
+function saveBest() { if (R.score >= bestNow && R.score > 0) try { localStorage.setItem('run2_best_' + diffKey, String(R.score)); } catch (_) {} }
 function addScoreTo(n) {
   if (n <= R.score) return;
   R.score = n;
@@ -1779,12 +1779,12 @@ const touch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in windo
 // ---------- Leaderboard (same setup as the Evolution Game, its own boards) ----------
 const FIREBASE = { apiKey:'AIzaSyD6hux9hQsFsfnYTGCTbo4EBDbfo8O8my8', projectId:'doodle-games-8beba' };
 const LB_ON = !!(FIREBASE.apiKey && FIREBASE.projectId);
-const BOARD = 'runner1_';                           // runner1_easy / runner1_normal / runner1_hard
+const BOARD = 'runner2_';                           // runner2_easy / runner2_normal / runner2_hard (fresh boards from v7.1, new card order)
 const lbCache = {};
 const fsURL = p => `https://firestore.googleapis.com/v1/projects/${FIREBASE.projectId}/databases/(default)/documents${p}?key=${FIREBASE.apiKey}`;
 const savedName = () => { try { for (const key of ['doodle_name', 'evo_name']) { const n = localStorage.getItem(key); if (/^[A-Z]{3}$/.test(n)) return n; } } catch (_) {} return ''; };
-function loadRec(k) { try { const r = JSON.parse(localStorage.getItem('run1_bestrec_' + k)); return r && r.score > 0 ? r : null; } catch (_) { return null; } }
-function saveRec(k, r) { try { localStorage.setItem('run1_bestrec_' + k, JSON.stringify(r)); } catch (_) {} }
+function loadRec(k) { try { const r = JSON.parse(localStorage.getItem('run2_bestrec_' + k)); return r && r.score > 0 ? r : null; } catch (_) { return null; } }
+function saveRec(k, r) { try { localStorage.setItem('run2_bestrec_' + k, JSON.stringify(r)); } catch (_) {} }
 async function fetchBoard(k, n = 3) {
   const r = await fetch(fsURL(':runQuery'), { method:'POST', headers:{ 'Content-Type':'application/json' },
     body: JSON.stringify({ structuredQuery:{ from:[{ collectionId:BOARD + k }], orderBy:[{ field:{ fieldPath:'score' }, direction:'DESCENDING' }], limit:n } }) });
